@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Tienda de Recompensas: Impact Hub</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;700;900&family=Manrope:wght@400;500;700;800&display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script src="js/config.js"></script>
+    <script src="js/script.js" defer></script>
+</head>
+
+<body
+    class="bg-background-light dark:bg-background-dark text-text-main dark:text-text-light font-body transition-colors duration-200">
+    <div class="relative flex h-auto min-h-screen w-full flex-col overflow-x-hidden">
+        <!-- Header Unificado -->
+        <header
+            class="sticky top-0 z-50 flex items-center justify-between whitespace-nowrap border-b border-solid border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark px-4 py-3 md:px-10 shadow-sm">
+            <div class="flex items-center gap-4">
+                <a href="index.html" class="flex items-center gap-3 cursor-pointer">
+                    <div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-background-dark">
+                        <span class="material-symbols-outlined font-bold">volunteer_activism</span>
+                    </div>
+                    <h2 class="text-text-main dark:text-text-light text-lg font-bold leading-tight tracking-[-0.015em]">
+                        Impact Hub</h2>
+                </a>
+            </div>
+            <div class="flex flex-1 justify-end gap-4 md:gap-8 items-center">
+                <div id="mobile-nav" class="hidden md:flex items-center gap-6 lg:gap-9">
+                    <a class="text-text-main dark:text-text-light hover:text-primary text-sm font-medium leading-normal transition-colors"
+                        href="proyectos.html">Proyectos</a>
+                    <a class="text-primary text-sm font-bold leading-normal transition-colors"
+                        href="tienda.html">Tienda</a>
+                    <a class="text-text-main dark:text-text-light hover:text-primary text-sm font-medium leading-normal transition-colors"
+                        href="#">Clasificación</a>
+                    <a class="text-text-main dark:text-text-light hover:text-primary text-sm font-medium leading-normal transition-colors"
+                        href="#">Impacto 2026</a>
+                    <div
+                        class="flex items-center gap-2 bg-gray-100 dark:bg-slate-800 px-3 py-1 rounded-full border border-border-light dark:border-border-dark ml-2">
+                        <span class="material-symbols-outlined text-primary text-sm">savings</span>
+                        <span class="font-display font-black text-text-main dark:text-text-light text-xs">1,250
+                            PTS</span>
+                    </div>
+                </div>
+                <div class="flex gap-2 items-center">
+                    <a href="login.html">
+                        <button
+                            class="flex cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-primary hover:bg-green-400 text-[#111813] text-sm font-bold leading-normal tracking-[0.015em] transition-colors">
+                            <span class="truncate">Iniciar Sesión</span>
+                        </button>
+                    </a>
+                    <button id="theme-toggle"
+                        class="flex size-10 cursor-pointer items-center justify-center overflow-hidden rounded-lg bg-background-light dark:bg-border-dark text-text-main dark:text-text-light hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
+                        <span class="material-symbols-outlined text-[20px]">contrast</span>
+                    </button>
+                    <button id="mobile-menu-button"
+                        class="md:hidden flex size-10 cursor-pointer items-center justify-center overflow-hidden rounded-lg bg-background-light dark:bg-border-dark text-text-main dark:text-text-light">
+                        <span class="material-symbols-outlined text-[20px]">menu</span>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <main class="flex-1 flex flex-col items-center w-full px-4 md:px-10 py-12">
+            <div class="w-full max-w-[1280px] flex flex-col gap-12">
+                <!-- Hero de la Tienda -->
+                <section
+                    class="relative rounded-3xl overflow-hidden bg-surface-light dark:bg-surface-dark shadow-soft border border-border-light dark:border-border-dark p-8 md:p-12">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center relative z-10">
+                        <div class="flex flex-col gap-6">
+                            <div class="inline-flex items-center gap-2">
+                                <span
+                                    class="px-3 py-1 bg-text-main text-text-light text-[10px] font-black uppercase tracking-widest rounded-full">Temporada
+                                    '26</span>
+                                <span
+                                    class="px-3 py-1 bg-primary/10 text-primary-dark text-[10px] font-black uppercase tracking-widest rounded-full">Recompensas
+                                    Globales</span>
+                            </div>
+                            <h1
+                                class="text-4xl md:text-6xl font-display font-black leading-[0.95] tracking-tight text-text-main dark:text-text-light">
+                                TU IMPACTO,<br />
+                                <span
+                                    class="text-transparent bg-clip-text bg-gradient-to-r from-primary to-emerald-600">TU
+                                    JUEGO.</span>
+                            </h1>
+                            <p class="text-text-muted dark:text-gray-400 text-lg font-medium max-w-lg leading-relaxed">
+                                Convierte tus acciones solidarias en skins legendarias, paVos y contenido exclusivo para
+                                tus juegos favoritos.
+                            </p>
+                            <div class="flex flex-wrap gap-4 mt-2">
+                                <span class="text-xs font-bold text-gray-400 uppercase flex items-center gap-2"><span
+                                        class="w-2 h-2 rounded-full bg-brand-lol"></span>LoL</span>
+                                <span class="text-xs font-bold text-gray-400 uppercase flex items-center gap-2"><span
+                                        class="w-2 h-2 rounded-full bg-brand-fortnite"></span>Fortnite</span>
+                                <span class="text-xs font-bold text-gray-400 uppercase flex items-center gap-2"><span
+                                        class="w-2 h-2 rounded-full bg-brand-roblox"></span>Roblox</span>
+                                <span class="text-xs font-bold text-gray-400 uppercase flex items-center gap-2"><span
+                                        class="w-2 h-2 rounded-full bg-brand-minecraft"></span>Minecraft</span>
+                            </div>
+                        </div>
+                        <div class="relative h-64 lg:h-full min-h-[300px] flex items-center justify-center">
+                            <div
+                                class="absolute inset-0 bg-gradient-to-br from-gray-50 dark:from-slate-800 to-white dark:to-surface-dark rounded-2xl">
+                            </div>
+                            <div
+                                class="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl">
+                            </div>
+                            <div
+                                class="relative z-10 w-full max-w-md bg-surface-light dark:bg-slate-800 rounded-2xl shadow-xl border border-border-light dark:border-border-dark p-6 transform rotate-2 transition-transform hover:rotate-0 duration-500">
+                                <div
+                                    class="flex items-center justify-between mb-4 border-b border-gray-100 dark:border-slate-700 pb-4">
+                                    <span
+                                        class="font-display font-bold text-text-main dark:text-text-light uppercase text-sm">Destacado</span>
+                                    <span
+                                        class="text-[10px] font-black text-brand-fortnite bg-brand-fortnite/10 px-2 py-1 rounded">FORTNITE</span>
+                                </div>
+                                <div class="flex gap-4 items-center">
+                                    <div
+                                        class="size-20 bg-gray-100 dark:bg-slate-700 rounded-lg flex items-center justify-center text-4xl shadow-inner">
+                                        🕺</div>
+                                    <div>
+                                        <h3 class="font-bold text-xl text-text-main dark:text-text-light leading-tight">
+                                            Pack Baile "Victory"</h3>
+                                        <p class="text-sm text-text-muted mt-1">Rareza Épica • Temporada 5</p>
+                                    </div>
+                                </div>
+                                <div class="mt-6">
+                                    <button
+                                        class="w-full py-3 bg-text-main dark:bg-primary text-text-light dark:text-background-dark rounded-xl font-bold font-display uppercase tracking-wide hover:bg-primary dark:hover:bg-green-400 transition-colors transition-transform active:scale-95">
+                                        Canjear por 800 PTS
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Filtros -->
+                <div class="flex flex-wrap gap-2 md:gap-4 justify-center">
+                    <button
+                        class="px-6 py-2.5 rounded-full bg-text-main dark:bg-primary text-text-light dark:text-background-dark text-sm font-bold shadow-lg transition-all active:scale-95">Todos</button>
+                    <button
+                        class="px-6 py-2.5 rounded-full bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark text-text-main dark:text-text-light text-sm font-bold hover:border-primary hover:text-primary transition-colors">Skins
+                        & Cosméticos</button>
+                    <button
+                        class="px-6 py-2.5 rounded-full bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark text-text-main dark:text-text-light text-sm font-bold hover:border-primary hover:text-primary transition-colors">Monedas
+                        Virtuales</button>
+                    <button
+                        class="px-6 py-2.5 rounded-full bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark text-text-main dark:text-text-light text-sm font-bold hover:border-primary hover:text-primary transition-colors">DLCs
+                        & Expansiones</button>
+                </div>
+
+                <!-- Cuadrícula de Productos -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <!-- Skin LoL -->
+                    <div
+                        class="group bg-surface-light dark:bg-surface-dark rounded-2xl p-3 border border-border-light dark:border-border-dark shadow-sm hover:shadow-hover transition-all duration-300 hover:-translate-y-1">
+                        <div class="relative aspect-[3/4] rounded-xl overflow-hidden bg-slate-900">
+                            <img class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity"
+                                src="https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&q=80&w=800"
+                                alt="Cyber Warrior Ezreal">
+                            <div
+                                class="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-transparent opacity-80">
+                            </div>
+                            <div
+                                class="absolute top-3 left-3 bg-[#000913] border border-[#C8AA6E] px-2 py-1 rounded flex items-center gap-1.5 shadow-md">
+                                <div class="size-2 rounded-full bg-brand-lol"></div>
+                                <span class="text-[10px] font-bold text-[#C8AA6E] uppercase tracking-wide">League of
+                                    Legends</span>
+                            </div>
+                            <div class="absolute top-3 right-3">
+                                <span
+                                    class="size-6 flex items-center justify-center bg-rarity-legendary text-white rounded-full text-xs shadow-lg font-bold"
+                                    title="Legendary">L</span>
+                            </div>
+                            <div class="absolute bottom-4 left-4 right-4">
+                                <h3 class="text-white font-display font-bold text-xl leading-tight mb-1">Skin Legendaria
+                                </h3>
+                                <p class="text-gray-300 text-xs font-medium truncate">Cyber Warrior Ezreal</p>
+                            </div>
+                        </div>
+                        <div class="mt-4 px-1 pb-1 flex items-center justify-between">
+                            <div
+                                class="flex items-center gap-1.5 text-text-main dark:text-text-light font-bold text-lg">
+                                <span class="material-symbols-outlined text-primary text-xl">toll</span> 1,820
+                            </div>
+                            <button
+                                class="bg-primary hover:bg-green-400 text-background-dark px-5 py-2 rounded-lg text-xs font-black uppercase tracking-wider transition-colors shadow-glow">Canjear</button>
+                        </div>
+                    </div>
+
+                    <!-- Emote Fortnite -->
+                    <div
+                        class="group bg-surface-light dark:bg-surface-dark rounded-2xl p-3 border border-border-light dark:border-border-dark shadow-sm hover:shadow-hover transition-all duration-300 hover:-translate-y-1">
+                        <div class="relative aspect-[3/4] rounded-xl overflow-hidden bg-brand-fortnite">
+                            <div
+                                class="absolute inset-0 flex items-center justify-center bg-[url('https://www.transparenttextures.com/patterns/diagmonds-light.png')] opacity-20">
+                            </div>
+                            <div class="absolute inset-0 flex items-center justify-center z-10">
+                                <span class="text-6xl filter drop-shadow-lg">💃</span>
+                            </div>
+                            <div
+                                class="absolute top-3 left-3 bg-white px-2 py-1 rounded flex items-center gap-1.5 shadow-md">
+                                <span
+                                    class="text-[10px] font-black text-brand-fortnite uppercase tracking-wide">FORTNITE</span>
+                            </div>
+                            <div class="absolute top-3 right-3">
+                                <span
+                                    class="size-6 flex items-center justify-center bg-rarity-epic text-white rounded-full text-xs shadow-lg font-bold"
+                                    title="Epic">E</span>
+                            </div>
+                            <div
+                                class="absolute bottom-0 left-0 w-full p-4 bg-gradient-to-t from-black/80 to-transparent">
+                                <h3 class="text-white font-display font-bold text-xl leading-tight mb-1">Emote Épico
+                                </h3>
+                                <p class="text-gray-200 text-xs font-medium truncate">Baile de la Victoria</p>
+                            </div>
+                        </div>
+                        <div class="mt-4 px-1 pb-1 flex items-center justify-between">
+                            <div
+                                class="flex items-center gap-1.5 text-text-main dark:text-text-light font-bold text-lg">
+                                <span class="material-symbols-outlined text-primary text-xl">toll</span> 800
+                            </div>
+                            <button
+                                class="bg-primary hover:bg-green-400 text-background-dark px-5 py-2 rounded-lg text-xs font-black uppercase tracking-wider transition-colors shadow-glow">Canjear</button>
+                        </div>
+                    </div>
+
+                    <!-- Robux Roblox -->
+                    <div
+                        class="group bg-surface-light dark:bg-surface-dark rounded-2xl p-3 border border-border-light dark:border-border-dark shadow-sm hover:shadow-hover transition-all duration-300 hover:-translate-y-1">
+                        <div
+                            class="relative aspect-[3/4] rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex flex-col items-center justify-center">
+                            <div class="z-10 flex flex-col items-center">
+                                <span
+                                    class="material-symbols-outlined text-6xl text-slate-300 dark:text-slate-600 mb-2">token</span>
+                                <span
+                                    class="font-display font-black text-4xl text-slate-800 dark:text-text-light">1000</span>
+                                <span
+                                    class="font-bold text-sm text-slate-400 dark:text-slate-500 uppercase tracking-widest">Robux</span>
+                            </div>
+                            <div
+                                class="absolute top-3 left-3 bg-white dark:bg-surface-dark border border-gray-200 dark:border-slate-600 px-2 py-1 rounded flex items-center gap-1.5 shadow-sm">
+                                <div class="size-2 rounded-sm bg-brand-roblox transform rotate-45"></div>
+                                <span
+                                    class="text-[10px] font-black text-slate-700 dark:text-text-light uppercase tracking-wide">ROBLOX</span>
+                            </div>
+                            <div
+                                class="absolute bottom-0 left-0 w-full p-4 bg-white/90 dark:bg-surface-dark backdrop-blur-sm border-t border-gray-100 dark:border-slate-700">
+                                <h3
+                                    class="text-slate-800 dark:text-text-light font-display font-bold text-lg leading-tight mb-1">
+                                    Moneda Virtual</h3>
+                                <p class="text-slate-500 dark:text-text-muted text-xs font-medium truncate">Tarjeta
+                                    Regalo Digital</p>
+                            </div>
+                        </div>
+                        <div class="mt-4 px-1 pb-1 flex items-center justify-between">
+                            <div
+                                class="flex items-center gap-1.5 text-text-main dark:text-text-light font-bold text-lg">
+                                <span class="material-symbols-outlined text-primary text-xl">toll</span> 1,200
+                            </div>
+                            <button
+                                class="bg-primary hover:bg-green-400 text-background-dark px-5 py-2 rounded-lg text-xs font-black uppercase tracking-wider transition-colors shadow-glow">Canjear</button>
+                        </div>
+                    </div>
+
+                    <!-- Minecraft DLC -->
+                    <div
+                        class="group bg-surface-light dark:bg-surface-dark rounded-2xl p-3 border border-border-light dark:border-border-dark shadow-sm hover:shadow-hover transition-all duration-300 hover:-translate-y-1">
+                        <div class="relative aspect-[3/4] rounded-xl overflow-hidden bg-[#3c3631]">
+                            <img class="w-full h-full object-cover opacity-60 group-hover:opacity-80 transition-all"
+                                src="https://images.unsplash.com/photo-1627398242454-45a1465c2479?auto=format&fit=crop&q=80&w=800"
+                                alt="Minecraft Update">
+                            <div
+                                class="absolute top-3 left-3 bg-[#1d1d1d] border border-gray-700 px-2 py-1 rounded flex items-center gap-1.5 shadow-md">
+                                <span
+                                    class="text-[10px] font-bold text-brand-minecraft uppercase tracking-wide">MINECRAFT</span>
+                            </div>
+                            <div class="absolute inset-0 flex items-center justify-center z-10">
+                                <span
+                                    class="material-symbols-outlined text-white text-5xl drop-shadow-md">extension</span>
+                            </div>
+                            <div
+                                class="absolute bottom-0 left-0 w-full p-4 bg-gradient-to-t from-black/90 to-transparent">
+                                <h3 class="text-white font-display font-bold text-xl leading-tight mb-1">DLC Expansión
+                                </h3>
+                                <p class="text-gray-300 text-xs font-medium truncate">Nether Update Pack</p>
+                            </div>
+                        </div>
+                        <div class="mt-4 px-1 pb-1 flex items-center justify-between">
+                            <div
+                                class="flex items-center gap-1.5 text-text-main dark:text-text-light font-bold text-lg">
+                                <span class="material-symbols-outlined text-primary text-xl">toll</span> 1,500
+                            </div>
+                            <button
+                                class="bg-primary hover:bg-green-400 text-background-dark px-5 py-2 rounded-lg text-xs font-black uppercase tracking-wider transition-colors shadow-glow">Canjear</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Merchandising -->
+                <div class="mt-8">
+                    <div class="flex items-center justify-between mb-8">
+                        <h2
+                            class="text-2xl font-display font-bold text-text-main dark:text-text-light flex items-center gap-3">
+                            <span class="w-1.5 h-8 bg-primary rounded-full"></span> Merchandising Oficial
+                        </h2>
+                        <a class="text-sm font-bold text-primary hover:underline flex items-center gap-1" href="#">Ver
+                            Catálogo <span class="material-symbols-outlined text-sm">arrow_forward</span></a>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <!-- T-shirt -->
+                        <div
+                            class="flex bg-surface-light dark:bg-slate-800 rounded-2xl overflow-hidden border border-border-light dark:border-border-dark hover:shadow-lg transition-all">
+                            <div class="w-32 bg-gray-100 dark:bg-slate-700 relative shrink-0">
+                                <img class="w-full h-full object-cover"
+                                    src="https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&q=80&w=400"
+                                    alt="Camiseta ODS 1">
+                            </div>
+                            <div class="p-5 flex flex-col justify-between flex-1">
+                                <div>
+                                    <span
+                                        class="text-[10px] font-black text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-900/20 px-2 py-0.5 rounded-full mb-2 inline-block">EDICIÓN
+                                        LIMITADA</span>
+                                    <h3
+                                        class="font-display font-bold text-text-main dark:text-text-light leading-tight">
+                                        Camiseta "ODS 1"</h3>
+                                    <p class="text-xs text-text-muted mt-1">Algodón Orgánico Premium</p>
+                                </div>
+                                <div class="flex items-end justify-between mt-4">
+                                    <span class="font-black text-text-main dark:text-text-light text-lg">2,500
+                                        PTS</span>
+                                    <button
+                                        class="text-[10px] font-black uppercase text-primary border border-primary px-3 py-1.5 rounded-lg hover:bg-primary hover:text-background-dark transition-colors">Canjear</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Cap -->
+                        <div
+                            class="flex bg-surface-light dark:bg-slate-800 rounded-2xl overflow-hidden border border-border-light dark:border-border-dark hover:shadow-lg transition-all">
+                            <div class="w-32 bg-gray-100 dark:bg-slate-700 relative shrink-0">
+                                <img class="w-full h-full object-cover"
+                                    src="https://images.unsplash.com/photo-1588850567047-147949285b51?auto=format&fit=crop&q=80&w=400"
+                                    alt="Gorra Impact">
+                            </div>
+                            <div class="p-5 flex flex-col justify-between flex-1">
+                                <div>
+                                    <span
+                                        class="text-[10px] font-black text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 px-2 py-0.5 rounded-full mb-2 inline-block">RARO</span>
+                                    <h3
+                                        class="font-display font-bold text-text-main dark:text-text-light leading-tight">
+                                        Gorra Impacto</h3>
+                                    <p class="text-xs text-text-muted mt-1">Bordado 3D Futurista</p>
+                                </div>
+                                <div class="flex items-end justify-between mt-4">
+                                    <span class="font-black text-text-main dark:text-text-light text-lg">1,800
+                                        PTS</span>
+                                    <button
+                                        class="text-[10px] font-black uppercase text-primary border border-primary px-3 py-1.5 rounded-lg hover:bg-primary hover:text-background-dark transition-colors">Canjear</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer Unificado -->
+        <footer
+            class="flex flex-col gap-6 border-t border-solid border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark px-4 md:px-10 py-10 transition-colors">
+            <div class="flex flex-col md:flex-row justify-between gap-10">
+                <div class="flex flex-col gap-4">
+                    <div class="flex items-center gap-3">
+                        <div
+                            class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-background-dark">
+                            <span class="material-symbols-outlined font-bold">volunteer_activism</span>
+                        </div>
+                        <h2 class="text-text-main dark:text-text-light text-xl font-bold">Impact Hub</h2>
+                    </div>
+                    <p class="text-text-muted dark:text-gray-400 max-w-sm">Gaming for Good: La plataforma donde tu
+                        impacto social se convierte en recompensas digitales.</p>
+                </div>
+                <div class="grid grid-cols-2 sm:grid-cols-3 gap-10">
+                    <div class="flex flex-col gap-4">
+                        <h3 class="text-text-main dark:text-text-light font-bold">Plataforma</h3>
+                        <a href="proyectos.html"
+                            class="text-text-muted dark:text-gray-400 text-sm hover:text-primary transition-colors">Proyectos</a>
+                        <a href="tienda.html"
+                            class="text-text-muted dark:text-gray-400 text-sm hover:text-primary transition-colors">Tienda</a>
+                        <a href="#"
+                            class="text-text-muted dark:text-gray-400 text-sm hover:text-primary transition-colors">Impacto</a>
+                    </div>
+                    <div class="flex flex-col gap-4">
+                        <h3 class="text-text-main dark:text-text-light font-bold">Legal</h3>
+                        <a href="#"
+                            class="text-text-muted dark:text-gray-400 text-sm hover:text-primary transition-colors">Privacidad</a>
+                        <a href="#"
+                            class="text-text-muted dark:text-gray-400 text-sm hover:text-primary transition-colors">Términos</a>
+                    </div>
+                </div>
+            </div>
+            <div
+                class="border-t border-border-light dark:border-border-dark pt-6 flex flex-col md:flex-row justify-between items-center gap-4">
+                <p class="text-text-muted dark:text-gray-400 text-xs">© 2026 Impact Hub | Gaming for Good. Todos los
+                    derechos reservados.</p>
+                <div class="flex gap-4">
+                    <span
+                        class="material-symbols-outlined text-text-muted dark:text-gray-400 cursor-pointer hover:text-primary">public</span>
+                    <span
+                        class="material-symbols-outlined text-text-muted dark:text-gray-400 cursor-pointer hover:text-primary">gamepad</span>
+                </div>
+            </div>
+        </footer>
+    </div>
+</body>
+
+</html>

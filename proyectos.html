@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Proyectos ODS 1: Impact Hub</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&amp;family=Noto+Sans:wght@400;500;700&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script src="js/config.js"></script>
+    <script src="js/script.js" defer></script>
+</head>
+
+<body
+    class="bg-background-light dark:bg-background-dark text-text-main dark:text-text-light font-display transition-colors duration-200">
+    <div class="relative flex h-auto min-h-screen w-full flex-col overflow-x-hidden">
+        <!-- Header Unificado -->
+        <header
+            class="sticky top-0 z-50 flex items-center justify-between whitespace-nowrap border-b border-solid border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark px-4 py-3 md:px-10 shadow-sm">
+            <div class="flex items-center gap-4">
+                <a href="index.html" class="flex items-center gap-3 cursor-pointer">
+                    <div class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-background-dark">
+                        <span class="material-symbols-outlined font-bold">volunteer_activism</span>
+                    </div>
+                    <h2 class="text-text-main dark:text-text-light text-lg font-bold leading-tight tracking-[-0.015em]">
+                        Impact Hub</h2>
+                </a>
+            </div>
+            <div class="flex flex-1 justify-end gap-4 md:gap-8 items-center">
+                <div id="mobile-nav" class="hidden md:flex items-center gap-6 lg:gap-9">
+                    <a class="text-primary text-sm font-bold leading-normal transition-colors"
+                        href="proyectos.html">Proyectos</a>
+                    <a class="text-text-main dark:text-text-light hover:text-primary text-sm font-medium leading-normal transition-colors"
+                        href="tienda.html">Tienda</a>
+                    <a class="text-text-main dark:text-text-light hover:text-primary text-sm font-medium leading-normal transition-colors"
+                        href="#">Clasificación</a>
+                    <a class="text-text-main dark:text-text-light hover:text-primary text-sm font-medium leading-normal transition-colors"
+                        href="#">Impacto 2026</a>
+                </div>
+                <div class="flex gap-2 items-center">
+                    <a href="login.html">
+                        <button
+                            class="flex cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-primary hover:bg-green-400 text-[#111813] text-sm font-bold leading-normal tracking-[0.015em] transition-colors">
+                            <span class="truncate">Iniciar Sesión</span>
+                        </button>
+                    </a>
+                    <button id="theme-toggle"
+                        class="flex size-10 cursor-pointer items-center justify-center overflow-hidden rounded-lg bg-background-light dark:bg-border-dark text-text-main dark:text-text-light hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
+                        <span class="material-symbols-outlined text-[20px]">contrast</span>
+                    </button>
+                    <button id="mobile-menu-button"
+                        class="md:hidden flex size-10 cursor-pointer items-center justify-center overflow-hidden rounded-lg bg-background-light dark:bg-border-dark text-text-main dark:text-text-light">
+                        <span class="material-symbols-outlined text-[20px]">menu</span>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <main class="flex-1 flex flex-col items-center py-10 md:py-16">
+            <!-- Sección de Título -->
+            <section class="w-full max-w-[1280px] px-4 md:px-10 mb-12">
+                <div class="flex flex-col gap-4">
+                    <h1 class="text-text-main dark:text-text-light text-3xl md:text-5xl font-black tracking-tight">
+                        Proyectos de Impacto Real</h1>
+                    <p class="text-text-muted dark:text-gray-400 text-lg max-w-3xl">Explora y financia iniciativas
+                        verificadas que están combatiendo la pobreza en todo el mundo. Cada donación cuenta como puntos
+                        de impacto para tu perfil.</p>
+                </div>
+            </section>
+
+            <!-- Filtros Rápidos -->
+            <section
+                class="w-full max-w-[1280px] px-4 md:px-10 mb-8 border-b border-border-light dark:border-border-dark pb-6">
+                <div class="flex flex-wrap gap-3">
+                    <button class="px-4 py-2 rounded-full bg-primary text-text-main font-bold text-sm">Todos</button>
+                    <button
+                        class="px-4 py-2 rounded-full bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark text-text-main dark:text-text-light hover:border-primary text-sm transition-colors">Infraestructura</button>
+                    <button
+                        class="px-4 py-2 rounded-full bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark text-text-main dark:text-text-light hover:border-primary text-sm transition-colors">Educación</button>
+                    <button
+                        class="px-4 py-2 rounded-full bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark text-text-main dark:text-text-light hover:border-primary text-sm transition-colors">Salud</button>
+                </div>
+            </section>
+
+            <!-- Cuadrícula de Proyectos -->
+            <section class="w-full max-w-[1280px] px-4 md:px-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Proyecto 1 -->
+                <div
+                    class="flex flex-col bg-surface-light dark:bg-surface-dark rounded-2xl border border-border-light dark:border-border-dark overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+                    <div class="aspect-video bg-gray-200 dark:bg-gray-800 relative overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&q=80&w=800"
+                            alt="Huerto Comunitario"
+                            class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                        <div
+                            class="absolute top-3 left-3 px-3 py-1 bg-primary text-text-main text-xs font-bold rounded-full shadow-sm">
+                            Meta: $10,000</div>
+                    </div>
+                    <div class="p-6 flex flex-col gap-4">
+                        <div class="flex justify-between items-start">
+                            <h3 class="text-xl font-bold text-text-main dark:text-text-light mb-2">Huertos Sostenibles
+                                2026</h3>
+                            <span
+                                class="text-[10px] bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 px-2 py-0.5 rounded font-bold uppercase">Org</span>
+                        </div>
+                        <p class="text-text-muted dark:text-gray-400 text-sm line-clamp-2">Implementación de sistemas de
+                            riego automático y formación agrícola para 50 familias en riesgo.</p>
+                        <div class="flex flex-col gap-2">
+                            <div
+                                class="flex justify-between text-[10px] font-black uppercase tracking-widest text-text-muted">
+                                <span class="text-primary">85% Recaudado</span>
+                                <span>$8,540 / $10,000</span>
+                            </div>
+                            <div class="w-full h-1.5 bg-border-light dark:bg-border-dark rounded-full overflow-hidden">
+                                <div class="w-[85%] h-full bg-primary shadow-[0_0_10px_rgba(19,236,91,0.5)]"></div>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3 mt-2">
+                            <button
+                                class="py-2.5 bg-primary hover:bg-green-400 text-text-main text-sm font-bold rounded-xl transition-all active:scale-95 flex items-center justify-center gap-2">
+                                <span>Donar</span>
+                            </button>
+                            <button onclick="openModal(1)"
+                                class="py-2.5 bg-transparent border border-border-light dark:border-border-dark text-text-main dark:text-text-light text-sm font-bold rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-all active:scale-95">
+                                Conocer más
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Proyecto 2 -->
+                <div
+                    class="flex flex-col bg-surface-light dark:bg-surface-dark rounded-2xl border border-border-light dark:border-border-dark overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+                    <div class="aspect-video bg-gray-200 dark:bg-gray-800 relative overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1511174511562-5f7f18b874f8?auto=format&fit=crop&q=80&w=800"
+                            alt="Clínica Móvil"
+                            class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                        <div
+                            class="absolute top-3 left-3 px-3 py-1 bg-primary text-text-main text-xs font-bold rounded-full shadow-sm">
+                            Meta: $25,000</div>
+                    </div>
+                    <div class="p-6 flex flex-col gap-4">
+                        <div class="flex justify-between items-start">
+                            <h3 class="text-xl font-bold text-text-main dark:text-text-light mb-2">Luz para Aprender
+                            </h3>
+                            <span
+                                class="text-[10px] bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 px-2 py-0.5 rounded font-bold uppercase">Pers</span>
+                        </div>
+                        <p class="text-text-muted dark:text-gray-400 text-sm line-clamp-2">Instalación de paneles
+                            solares en escuelas rurales alejadas para habilitar salas de computación.</p>
+                        <div class="flex flex-col gap-2">
+                            <div
+                                class="flex justify-between text-[10px] font-black uppercase tracking-widest text-text-muted">
+                                <span class="text-primary">40% Recaudado</span>
+                                <span>$10,120 / $25,000</span>
+                            </div>
+                            <div class="w-full h-1.5 bg-border-light dark:bg-border-dark rounded-full overflow-hidden">
+                                <div class="w-[40%] h-full bg-primary shadow-[0_0_10px_rgba(19,236,91,0.5)]"></div>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3 mt-2">
+                            <button
+                                class="py-2.5 bg-primary hover:bg-green-400 text-text-main text-sm font-bold rounded-xl transition-all active:scale-95 flex items-center justify-center gap-2">
+                                <span>Donar</span>
+                            </button>
+                            <button onclick="openModal(2)"
+                                class="py-2.5 bg-transparent border border-border-light dark:border-border-dark text-text-main dark:text-text-light text-sm font-bold rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-all active:scale-95">
+                                Conocer más
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Proyecto 3 -->
+                <div
+                    class="flex flex-col bg-surface-light dark:bg-surface-dark rounded-2xl border border-border-light dark:border-border-dark overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+                    <div class="aspect-video bg-gray-200 dark:bg-gray-800 relative overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1541544537156-7627a7a4aa1c?q=80&w=800&auto=format&fit=crop"
+                            alt="Agua Potable"
+                            class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                        <div
+                            class="absolute top-3 left-3 px-3 py-1 bg-primary text-text-main text-xs font-bold rounded-full shadow-sm">
+                            Meta: $15,000</div>
+                    </div>
+                    <div class="p-6 flex flex-col gap-4">
+                        <div class="flex justify-between items-start">
+                            <h3 class="text-xl font-bold text-text-main dark:text-text-light mb-2">Agua Limpia 2026</h3>
+                            <span
+                                class="text-[10px] bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 px-2 py-0.5 rounded font-bold uppercase">Org</span>
+                        </div>
+                        <p class="text-text-muted dark:text-gray-400 text-sm line-clamp-2">Construcción de 3 pozos de
+                            agua potable y sistemas de filtrado por ósmosis en aldeas remotas.</p>
+                        <div class="flex flex-col gap-2">
+                            <div
+                                class="flex justify-between text-[10px] font-black uppercase tracking-widest text-text-muted">
+                                <span class="text-primary">62% Recaudado</span>
+                                <span>$9,300 / $15,000</span>
+                            </div>
+                            <div class="w-full h-1.5 bg-border-light dark:bg-border-dark rounded-full overflow-hidden">
+                                <div class="w-[62%] h-full bg-primary shadow-[0_0_10px_rgba(19,236,91,0.5)]"></div>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3 mt-2">
+                            <button
+                                class="py-2.5 bg-primary hover:bg-green-400 text-text-main text-sm font-bold rounded-xl transition-all active:scale-95 flex items-center justify-center gap-2">
+                                <span>Donar</span>
+                            </button>
+                            <button onclick="openModal(3)"
+                                class="py-2.5 bg-transparent border border-border-light dark:border-border-dark text-text-main dark:text-text-light text-sm font-bold rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-all active:scale-95">
+                                Conocer más
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Proyecto 4 -->
+                <div
+                    class="flex flex-col bg-surface-light dark:bg-surface-dark rounded-2xl border border-border-light dark:border-border-dark overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+                    <div class="aspect-video bg-gray-200 dark:bg-gray-800 relative overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&q=80&w=800"
+                            alt="Educación Digital"
+                            class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                        <div
+                            class="absolute top-3 left-3 px-3 py-1 bg-primary text-text-main text-xs font-bold rounded-full shadow-sm">
+                            Meta: $5,000</div>
+                    </div>
+                    <div class="p-6 flex flex-col gap-4">
+                        <div class="flex justify-between items-start">
+                            <h3 class="text-xl font-bold text-text-main dark:text-text-light mb-2">Kits de Estudio 2026
+                            </h3>
+                            <span
+                                class="text-[10px] bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 px-2 py-0.5 rounded font-bold uppercase">Pers</span>
+                        </div>
+                        <p class="text-text-muted dark:text-gray-400 text-sm line-clamp-2">Entrega de tabletas con
+                            contenido offline y paneles solares portátiles para estudiantes.</p>
+                        <div class="flex flex-col gap-2">
+                            <div
+                                class="flex justify-between text-[10px] font-black uppercase tracking-widest text-text-muted">
+                                <span class="text-primary">95% Recaudado</span>
+                                <span>$4,750 / $5,000</span>
+                            </div>
+                            <div class="w-full h-1.5 bg-border-light dark:bg-border-dark rounded-full overflow-hidden">
+                                <div class="w-[95%] h-full bg-primary shadow-[0_0_10px_rgba(19,236,91,0.5)]"></div>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3 mt-2">
+                            <button
+                                class="py-2.5 bg-primary hover:bg-green-400 text-text-main text-sm font-bold rounded-xl transition-all active:scale-95 flex items-center justify-center gap-2">
+                                <span>Donar</span>
+                            </button>
+                            <button onclick="openModal(4)"
+                                class="py-2.5 bg-transparent border border-border-light dark:border-border-dark text-text-main dark:text-text-light text-sm font-bold rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-all active:scale-95">
+                                Conocer más
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Proyecto 5 -->
+                <div
+                    class="flex flex-col bg-surface-light dark:bg-surface-dark rounded-2xl border border-border-light dark:border-border-dark overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+                    <div class="aspect-video bg-gray-200 dark:bg-gray-800 relative overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1532629345422-7515f3d16bb6?auto=format&fit=crop&q=80&w=800"
+                            alt="Emprendimiento Femenino"
+                            class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                        <div
+                            class="absolute top-3 left-3 px-3 py-1 bg-primary text-text-main text-xs font-bold rounded-full shadow-sm">
+                            Meta: $12,000</div>
+                    </div>
+                    <div class="p-6 flex flex-col gap-4">
+                        <div class="flex justify-between items-start">
+                            <h3 class="text-xl font-bold text-text-main dark:text-text-light mb-2">Microcréditos Impulso
+                            </h3>
+                            <span
+                                class="text-[10px] bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 px-2 py-0.5 rounded font-bold uppercase">Org</span>
+                        </div>
+                        <p class="text-text-muted dark:text-gray-400 text-sm line-clamp-2">Fondo rotatorio para
+                            financiar pequeños negocios liderados por mujeres en zonas rurales.</p>
+                        <div class="flex flex-col gap-2">
+                            <div
+                                class="flex justify-between text-[10px] font-black uppercase tracking-widest text-text-muted">
+                                <span class="text-primary">25% Recaudado</span>
+                                <span>$3,000 / $12,000</span>
+                            </div>
+                            <div class="w-full h-1.5 bg-border-light dark:bg-border-dark rounded-full overflow-hidden">
+                                <div class="w-[25%] h-full bg-primary shadow-[0_0_10px_rgba(19,236,91,0.5)]"></div>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3 mt-2">
+                            <button
+                                class="py-2.5 bg-primary hover:bg-green-400 text-text-main text-sm font-bold rounded-xl transition-all active:scale-95 flex items-center justify-center gap-2">
+                                <span>Donar</span>
+                            </button>
+                            <button onclick="openModal(5)"
+                                class="py-2.5 bg-transparent border border-border-light dark:border-border-dark text-text-main dark:text-text-light text-sm font-bold rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-all active:scale-95">
+                                Conocer más
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Proyecto 6 -->
+                <div
+                    class="flex flex-col bg-surface-light dark:bg-surface-dark rounded-2xl border border-border-light dark:border-border-dark overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+                    <div class="aspect-video bg-gray-200 dark:bg-gray-800 relative overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1516574187841-cb9cc2ca948b?q=80&w=800&auto=format&fit=crop"
+                            alt="Salud Materna"
+                            class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                        <div
+                            class="absolute top-3 left-3 px-3 py-1 bg-primary text-text-main text-xs font-bold rounded-full shadow-sm">
+                            Meta: $30,000</div>
+                    </div>
+                    <div class="p-6 flex flex-col gap-4">
+                        <div class="flex justify-between items-start">
+                            <h3 class="text-xl font-bold text-text-main dark:text-text-light mb-2">Maternidad Segura
+                            </h3>
+                            <span
+                                class="text-[10px] bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 px-2 py-0.5 rounded font-bold uppercase">Org</span>
+                        </div>
+                        <p class="text-text-muted dark:text-gray-400 text-sm line-clamp-2">Equipamiento de salas de
+                            parto
+                            con tecnología básica y capacitación personal sanitario.</p>
+                        <div class="flex flex-col gap-2">
+                            <div
+                                class="flex justify-between text-[10px] font-black uppercase tracking-widest text-text-muted">
+                                <span class="text-primary">50% Recaudado</span>
+                                <span>$15,000 / $30,000</span>
+                            </div>
+                            <div class="w-full h-1.5 bg-border-light dark:bg-border-dark rounded-full overflow-hidden">
+                                <div class="w-[50%] h-full bg-primary shadow-[0_0_10px_rgba(19,236,91,0.5)]"></div>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3 mt-2">
+                            <button
+                                class="py-2.5 bg-primary hover:bg-green-400 text-text-main text-sm font-bold rounded-xl transition-all active:scale-95 flex items-center justify-center gap-2">
+                                <span>Donar</span>
+                            </button>
+                            <button onclick="openModal(6)"
+                                class="py-2.5 bg-transparent border border-border-light dark:border-border-dark text-text-main dark:text-text-light text-sm font-bold rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-all active:scale-95">
+                                Conocer más
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Modal de Detalles del Proyecto -->
+        <div id="project-modal" class="fixed inset-0 z-[100] hidden">
+            <!-- Overlay -->
+            <div class="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity" onclick="closeModal()"></div>
+
+            <!-- Contenedor Modal -->
+            <div class="absolute inset-0 flex items-center justify-center p-4 pointer-events-none">
+                <div
+                    class="bg-surface-light dark:bg-surface-dark w-full max-w-5xl max-h-[90vh] rounded-3xl overflow-hidden shadow-2xl pointer-events-auto flex flex-col relative animate-modal-in">
+                    <!-- Botón Cerrar -->
+                    <button onclick="closeModal()"
+                        class="absolute top-4 right-4 z-10 size-10 bg-black/20 hover:bg-black/40 text-white rounded-full flex items-center justify-center transition-colors">
+                        <span class="material-symbols-outlined">close</span>
+                    </button>
+
+                    <!-- Imagen Hero Modal -->
+                    <div class="h-48 md:h-64 bg-gray-200 relative overflow-hidden">
+                        <img id="modal-image" src="" alt="" class="w-full h-full object-cover">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                        <div class="absolute bottom-6 left-6 right-6">
+                            <div id="modal-category"
+                                class="inline-block px-3 py-1 bg-primary text-text-main text-[10px] font-black uppercase rounded-full mb-2">
+                                INFRAESTRUCTURA</div>
+                            <h2 id="modal-title" class="text-2xl md:text-3xl font-black text-white leading-tight">Título
+                                del Proyecto</h2>
+                        </div>
+                    </div>
+
+                    <!-- Contenido Scrollable -->
+                    <div class="flex-1 overflow-y-auto p-6 md:p-8 custom-scrollbar">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                            <!-- Columna Principal -->
+                            <div class="md:col-span-2 space-y-6">
+                                <div>
+                                    <h3 class="text-sm font-black uppercase tracking-widest text-primary mb-3">Sobre el
+                                        proyecto</h3>
+                                    <p id="modal-description"
+                                        class="text-text-muted dark:text-gray-400 leading-relaxed text-sm md:text-base">
+                                        Descripción detallada aquí...
+                                    </p>
+                                </div>
+
+                                <div class="grid grid-cols-2 gap-4 h-24 bg-gray-50 dark:bg-gray-800/50 rounded-2xl p-4">
+                                    <div class="flex flex-col justify-center">
+                                        <span
+                                            class="text-[10px] font-bold text-text-muted uppercase tracking-wider">Líder
+                                            / Org</span>
+                                        <span id="modal-founder"
+                                            class="font-bold text-text-main dark:text-text-light truncate">Nombre</span>
+                                    </div>
+                                    <div
+                                        class="flex flex-col justify-center border-l border-gray-200 dark:border-gray-700 pl-4">
+                                        <span
+                                            class="text-[10px] font-bold text-text-muted uppercase tracking-wider">Tipo</span>
+                                        <span id="modal-type"
+                                            class="font-bold text-text-main dark:text-text-light">Organización</span>
+                                    </div>
+                                </div>
+
+                                <!-- Redes Sociales -->
+                                <div>
+                                    <h3
+                                        class="text-sm font-black uppercase tracking-widest text-primary mb-4 text-center border-b border-primary/20 pb-2">
+                                        Canales de Impacto</h3>
+                                    <div id="modal-socials" class="flex flex-wrap justify-center gap-4">
+                                        <!-- Botones de redes se generan por JS -->
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Barra Lateral Detalle -->
+                            <div class="space-y-6">
+                                <div class="p-5 bg-primary/5 dark:bg-primary/10 rounded-2xl border border-primary/20">
+                                    <h4 class="text-xs font-black text-primary uppercase mb-4">Estado Financiero</h4>
+                                    <div class="space-y-4">
+                                        <div>
+                                            <div class="flex justify-between text-[11px] font-bold mb-1">
+                                                <span class="text-text-main dark:text-white">Progreso</span>
+                                                <span id="modal-percent" class="text-primary">0%</span>
+                                            </div>
+                                            <div
+                                                class="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                                                <div id="modal-progress-bar" class="h-full bg-primary"
+                                                    style="width: 0%"></div>
+                                            </div>
+                                        </div>
+                                        <div class="flex flex-col">
+                                            <span class="text-[22px] font-black text-text-main dark:text-white"
+                                                id="modal-raised">$0</span>
+                                            <span class="text-[10px] text-text-muted">de <span id="modal-goal">$0</span>
+                                                meta</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <button
+                                    class="w-full py-4 bg-primary hover:bg-green-400 text-text-main font-black rounded-2xl shadow-lg shadow-primary/20 transition-all hover:scale-[1.02] flex items-center justify-center gap-2">
+                                    <span>Donar Ahora</span>
+                                    <span class="material-symbols-outlined">favorite</span>
+                                </button>
+                                <button
+                                    class="w-full py-3 bg-white dark:bg-gray-800 border border-border-light dark:border-border-dark text-text-main dark:text-text-light text-xs font-bold rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition-all flex items-center justify-center gap-2">
+                                    <span class="material-symbols-outlined text-base">share</span>
+                                    <span>Compartir Objetivo</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            // Datos extendidos de los proyectos
+            const projects = {
+                1: {
+                    title: "Huertos Sostenibles 2026",
+                    category: "ALIMENTACIÓN",
+                    founder: "BioVida Fundation",
+                    type: "Organización",
+                    raised: "$8,540",
+                    goal: "$10,000",
+                    percent: "85%",
+                    image: "https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&q=80&w=800",
+                    description: "BioVida es una organización internacional que busca erradicar el hambre mediante la tecnología. Este proyecto implementa micro-huertos hidropónicos que ahorran un 90% de agua y producen alimentos todo el año. Ya hemos beneficiado a 30 familias y con tu ayuda llegaremos a las 50 planeadas.",
+                    socials: [
+                        { name: 'Youtube', icon: 'video_library', url: '#', color: 'bg-red-600' },
+                        { name: 'Twitch', icon: 'podcasts', url: '#', color: 'bg-purple-600' },
+                        { name: 'Instagram', icon: 'camera_alt', url: '#', color: 'bg-pink-600' }
+                    ]
+                },
+                2: {
+                    title: "Luz para Aprender",
+                    category: "EDUCACIÓN",
+                    founder: "Carlos Méndez",
+                    type: "Personal (Agente 2026)",
+                    raised: "$10,120",
+                    goal: "$25,000",
+                    percent: "40%",
+                    image: "https://images.unsplash.com/photo-1511174511562-5f7f18b874f8?auto=format&fit=crop&q=80&w=800",
+                    description: "Como educador, he visto cómo la falta de energía limita el futuro de mis alumnos. Este proyecto personal busca comprar e instalar 20 estaciones de energía solar para escuelas rurales en zonas de montaña. No solo damos luz, damos acceso al mundo digital.",
+                    socials: [
+                        { name: 'Instagram', icon: 'camera_alt', url: '#', color: 'bg-pink-600' },
+                        { name: 'Twitter', icon: 'star', url: '#', color: 'bg-blue-400' }
+                    ]
+                },
+                3: {
+                    title: "Agua Limpia 2026",
+                    category: "SALUD & AGUA",
+                    founder: "PureStream NGO",
+                    type: "Organización",
+                    raised: "$9,300",
+                    goal: "$15,000",
+                    percent: "62%",
+                    image: "https://images.unsplash.com/photo-1541544537156-7627a7a4aa1c?q=80&w=800&auto=format&fit=crop",
+                    description: "En PureStream creemos que el agua potable es un derecho humano. Estamos construyendo sistemas de filtración multietapa que eliminan el 99.9% de bacterias sin electricidad. Cada pozo salvará vidas y reducirá enfermedades infantiles en un 60%.",
+                    socials: [
+                        { name: 'Youtube', icon: 'video_library', url: '#', color: 'bg-red-600' },
+                        { name: 'Web', icon: 'public', url: '#', color: 'bg-blue-600' }
+                    ]
+                },
+                4: {
+                    title: "Kits de Estudio 2026",
+                    category: "EDUCACIÓN",
+                    founder: "Ana Silva",
+                    type: "Personal (Docente)",
+                    raised: "$4,750",
+                    goal: "$5,000",
+                    percent: "95%",
+                    image: "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&q=80&w=800",
+                    description: "He pasado años enseñando en zonas desconectadas. Este proyecto personal busca equipar a 100 niños con tablets cargadas de enciclopedias y cursos técnicos offline. Estamos a solo un paso de completar la meta y cambiar 100 historias.",
+                    socials: [
+                        { name: 'TikTok', icon: 'audiotrack', url: '#', color: 'bg-black' },
+                        { name: 'LinkedIn', icon: 'work', url: '#', color: 'bg-blue-700' }
+                    ]
+                },
+                5: {
+                    title: "Microcréditos Impulso",
+                    category: "ECONOMÍA",
+                    founder: "WomenImpact Network",
+                    type: "Organización",
+                    raised: "$3,000",
+                    goal: "$12,000",
+                    percent: "25%",
+                    image: "https://images.unsplash.com/photo-1532629345422-7515f3d16bb6?auto=format&fit=crop&q=80&w=800",
+                    description: "Empoderar a una mujer es empoderar a una comunidad entera. Nuestro sistema de microcréditos sin intereses permite que pequeñas emprendedoras compren maquinaria o materia prima. El 100% de lo recaudado va directo al fondo semilla.",
+                    socials: [
+                        { name: 'Youtube', icon: 'video_library', url: '#', color: 'bg-red-600' },
+                        { name: 'Facebook', icon: 'group', url: '#', color: 'bg-blue-800' }
+                    ]
+                },
+                6: {
+                    title: "Maternidad Segura",
+                    category: "SALUD",
+                    founder: "HealthForAll",
+                    type: "Organización",
+                    raised: "$15,000",
+                    goal: "$30,000",
+                    percent: "50%",
+                    image: "https://images.unsplash.com/photo-1516574187841-cb9cc2ca948b?q=80&w=800&auto=format&fit=crop",
+                    description: "Ninguna madre debería correr riesgos por falta de equipo básico. Estamos modernizando pequeñas postas médicas rurales con monitores fetales y kits quirúrgicos estériles. Nuestra meta es reducir la mortalidad materna a cero en la región.",
+                    socials: [
+                        { name: 'Twitch', icon: 'podcasts', url: '#', color: 'bg-purple-600' },
+                        { name: 'X', icon: 'close', url: '#', color: 'bg-zinc-900' }
+                    ]
+                }
+            };
+
+            const modal = document.getElementById('project-modal');
+
+            function openModal(id) {
+                const p = projects[id];
+                if (!p) return;
+
+                document.getElementById('modal-title').innerText = p.title;
+                document.getElementById('modal-category').innerText = p.category;
+                document.getElementById('modal-founder').innerText = p.founder;
+                document.getElementById('modal-type').innerText = p.type;
+                document.getElementById('modal-description').innerText = p.description;
+                document.getElementById('modal-raised').innerText = p.raised;
+                document.getElementById('modal-goal').innerText = p.goal;
+                document.getElementById('modal-percent').innerText = p.percent;
+                document.getElementById('modal-image').src = p.image;
+                document.getElementById('modal-progress-bar').style.width = p.percent;
+
+                // Generar redessociales
+                const socialContainer = document.getElementById('modal-socials');
+                socialContainer.innerHTML = '';
+                p.socials.forEach(s => {
+                    const btn = document.createElement('a');
+                    btn.href = s.url;
+                    btn.target = "_blank";
+                    btn.className = `flex items-center gap-2 px-4 py-2 ${s.color} text-white text-[11px] font-bold rounded-lg hover:opacity-90 transition-all`;
+                    btn.innerHTML = `<span class="material-symbols-outlined text-sm">${s.icon}</span><span>${s.name}</span>`;
+                    socialContainer.appendChild(btn);
+                });
+
+                modal.classList.remove('hidden');
+                document.body.style.overflow = 'hidden'; // Bloquear scroll fondo
+            }
+
+            function closeModal() {
+                modal.classList.add('hidden');
+                document.body.style.overflow = 'auto'; // Restaurar scroll
+            }
+
+            // Cerrar con tecla Escape
+            window.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') closeModal();
+            });
+        </script>
+        <!-- Footer Unificado -->
+        <footer
+            class="flex flex-col gap-6 border-t border-solid border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark px-4 md:px-10 py-10 transition-colors">
+            <div class="flex flex-col md:flex-row justify-between gap-10">
+                <div class="flex flex-col gap-4">
+                    <div class="flex items-center gap-3">
+                        <div
+                            class="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-background-dark">
+                            <span class="material-symbols-outlined font-bold">volunteer_activism</span>
+                        </div>
+                        <h2 class="text-text-main dark:text-text-light text-xl font-bold">Impact Hub</h2>
+                    </div>
+                    <p class="text-text-muted dark:text-gray-400 max-w-sm">La plataforma líder en micro-inversiones
+                        sociales para el cumplimiento de los ODS.</p>
+                </div>
+                <div class="grid grid-cols-2 sm:grid-cols-3 gap-10">
+                    <div class="flex flex-col gap-4">
+                        <h3 class="text-text-main dark:text-text-light font-bold">Plataforma</h3>
+                        <a href="proyectos.html"
+                            class="text-text-muted dark:text-gray-400 text-sm hover:text-primary transition-colors">Proyectos</a>
+                        <a href="#"
+                            class="text-text-muted dark:text-gray-400 text-sm hover:text-primary transition-colors">Gamificación</a>
+                        <a href="#"
+                            class="text-text-muted dark:text-gray-400 text-sm hover:text-primary transition-colors">Impacto</a>
+                    </div>
+                    <div class="flex flex-col gap-4">
+                        <h3 class="text-text-main dark:text-text-light font-bold">Legal</h3>
+                        <a href="#"
+                            class="text-text-muted dark:text-gray-400 text-sm hover:text-primary transition-colors">Privacidad</a>
+                        <a href="#"
+                            class="text-text-muted dark:text-gray-400 text-sm hover:text-primary transition-colors">Términos</a>
+                    </div>
+                </div>
+            </div>
+            <div
+                class="border-t border-border-light dark:border-border-dark pt-6 flex flex-col md:flex-row justify-between items-center gap-4">
+                <p class="text-text-muted dark:text-gray-400 text-xs">© 2026 Impact Hub. Todos los derechos reservados.
+                </p>
+                <div class="flex gap-4">
+                    <span
+                        class="material-symbols-outlined text-text-muted dark:text-gray-400 cursor-pointer hover:text-primary">public</span>
+                    <span
+                        class="material-symbols-outlined text-text-muted dark:text-gray-400 cursor-pointer hover:text-primary">mail</span>
+                </div>
+            </div>
+        </footer>
+    </div>
+</body>
+
+</html>

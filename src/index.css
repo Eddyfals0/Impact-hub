@@ -1,0 +1,136 @@
+@import "tailwindcss";
+
+/* ─── Design Tokens ─── */
+@theme {
+  --color-primary: #00d26a;
+  --color-primary-dark: #00a855;
+  --color-secondary: #1e293b;
+  --color-background-light: #f8fafc;
+  --color-background-dark: #0f172a;
+  --color-text-main: #1e293b;
+  --color-text-muted: #64748b;
+  --color-text-light: #f1f5f9;
+  --color-surface-light: #ffffff;
+  --color-surface-dark: #1e293b;
+  --color-border-light: #f1f5f9;
+  --color-border-dark: #334155;
+  --color-rarity-common: #94a3b8;
+  --color-rarity-rare: #3b82f6;
+  --color-rarity-epic: #a855f7;
+  --color-rarity-legendary: #eab308;
+  --color-brand-lol: #0ac8b9;
+  --color-brand-fortnite: #9d4dbb;
+  --color-brand-roblox: #de3537;
+  --color-brand-minecraft: #558b2f;
+
+  --font-display: "Exo 2", "Manrope", sans-serif;
+  --font-body: "Manrope", "Noto Sans", sans-serif;
+
+  --shadow-soft: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
+  --shadow-hover: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
+  --shadow-glow: 0 0 15px rgba(0, 210, 106, 0.3);
+}
+
+/* ─── Base ─── */
+:root {
+  --primary-color: #13ec5b;
+}
+
+body {
+  scroll-behavior: smooth;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* ─── Mobile Menu ─── */
+#mobile-nav.mobile-active {
+  display: flex !important;
+  flex-direction: column;
+  position: absolute;
+  top: 70px;
+  right: 1rem;
+  left: 1rem;
+  background: inherit;
+  background-color: white;
+  padding: 1.5rem;
+  border-radius: 1rem;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  z-index: 100;
+  border: 1px solid #e2e8f0;
+}
+
+.dark #mobile-nav.mobile-active {
+  background-color: #16251b;
+  border-color: #2a3c30;
+}
+
+/* ─── Scrollbar ─── */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* ─── Utility Classes ─── */
+.game-badge {
+  font-family: "Exo 2", sans-serif;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.glass {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.dark .glass {
+  background: rgba(22, 37, 27, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+::selection {
+  background-color: var(--primary-color);
+  color: #111813;
+}
+
+/* ─── Animations ─── */
+@keyframes float {
+  0% {
+    transform: translateY(0px);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
+
+  100% {
+    transform: translateY(0px);
+  }
+}
+
+.animate-float {
+  animation: float 4s ease-in-out infinite;
+}
+
+/* ─── No Scrollbar ─── */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}

@@ -1,15 +1,18 @@
 {
+  "_explicacion_general": "Este archivo define cómo se llama el proyecto, y qué librerías necesita descargar la computadora para hacerlo funcionar.",
   "name": "impact-hub-react",
   "private": true,
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "_explicacion_scripts": "Atajos rápidos que puedes correr en tu terminal. Por ejemplo, 'npm run dev' enciende el sitio web y 'npm run build' lo prepara para subir a internet.",
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview"
   },
   "dependencies": {
+    "_explicacion_librerias": "Librerías principales que el proyecto obligatoriamente requiere para estar encendido (Como React para la programación o Tailwind para los diseños).",
     "@tailwindcss/vite": "^4.1.18",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
@@ -17,6 +20,7 @@
     "tailwindcss": "^4.1.18"
   },
   "devDependencies": {
+    "_explicacion_herramientas": "Herramientas que se necesita para programar cómodamente, pero que no se subirán junto al proyecto final a internet (como ESLint o Vite).",
     "@eslint/js": "^9.39.1",
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",

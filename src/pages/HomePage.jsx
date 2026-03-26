@@ -14,7 +14,7 @@ const STEPS = [
 ]
 
 const PROJECTS = [
-    { category: 'Infraestructura', title: 'Agua Limpia para Kenia Rural', desc: 'Proporcionando fuentes de agua sostenibles para 500 familias en regiones afectadas por la sequía.', raised: '$5,000', goal: 'de $8,000', pct: 62, badge: 'Tendencia', badgeIcon: 'trending_up', badgeColor: 'text-primary', img: 'https://images.unsplash.com/photo-1518391846015-55a9cc00ddb5?q=80&w=800&auto=format&fit=crop' },
+    { category: 'Infraestructura', title: 'Agua Limpia para Kenia Rural', desc: 'Proporcionando fuentes de agua sostenibles para 500 familias en regiones afectadas por la sequía.', raised: '$5,000', goal: 'de $8,000', pct: 62, badge: 'Tendencia', badgeIcon: 'trending_up', badgeColor: 'text-primary', img: '/images/water_community.png' },
     { category: 'Crecimiento Económico', title: 'Microcréditos para Mujeres', desc: 'Empoderando a mujeres emprendedoras con capital semilla para iniciar sus propios negocios locales.', raised: '$2,100', goal: 'de $3,000', pct: 70, badge: 'Popular', badgeIcon: 'local_fire_department', badgeColor: 'text-orange-500', img: 'https://images.unsplash.com/photo-1532629345422-7515f3d16bb6?auto=format&fit=crop&q=80&w=800' },
     { category: 'Agricultura', title: 'Kits de Agricultura Sostenible', desc: 'Distribuyendo semillas resistentes a la sequía y herramientas a agricultores para garantizar la seguridad alimentaria.', raised: '$900', goal: 'de $10,000', pct: 9, badge: 'Nuevo', badgeIcon: 'new_releases', badgeColor: 'text-blue-500', img: 'https://images.unsplash.com/photo-1592982537447-7440770cbfc9?auto=format&fit=crop&q=80&w=800' },
     { category: 'Medio Ambiente', title: 'Reforestación Comunitaria', desc: 'Plantación de 5,000 árboles nativos para restaurar ecosistemas locales y combatir el cambio climático.', raised: '$4,500', goal: 'de $6,000', pct: 75, badge: 'Ecológico', badgeIcon: 'eco', badgeColor: 'text-green-500', img: 'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&q=80&w=800' },
@@ -35,6 +35,9 @@ const REWARDS = [
     { icon: 'local_mall', color: 'text-purple-500', name: 'Tote Bag Eco', pts: '1,200 Puntos', tag: 'MERCH', tagBg: 'bg-primary text-black' },
 ]
 
+// Pantalla principal de inicio de la plataforma.
+// Muestra el resumen del proyecto, estadísticas, cómo funciona
+// y botones rápidos para empezar a donar o jugar.
 export default function HomePage() {
     return (
         <div className="flex flex-col items-center">

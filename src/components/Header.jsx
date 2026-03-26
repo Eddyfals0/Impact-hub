@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useTheme } from '../context/ThemeContext'
 import { useAuth } from '../context/AuthContext'
 
+// Lista de enlaces principales que aparecen en la barra superior (Menú)
 const NAV_LINKS = [
     { to: '/proyectos', label: 'Proyectos' },
     { to: '/tienda', label: 'Tienda' },
@@ -10,22 +11,28 @@ const NAV_LINKS = [
     { to: '/ranking', label: 'Clasificación' },
 ]
 
+// Lista de opciones que aparecen cuando un usuario con sesión iniciada toca su foto
 const DROPDOWN_ITEMS = [
     { to: '/usuario', label: 'Mi Perfil', icon: 'person' },
     { to: '/configuracion', label: 'Configuración', icon: 'settings' },
     { to: '/ayuda', label: 'Ayuda', icon: 'help' },
 ]
 
+// La barra de navegación principal que siempre está pegada arriba de la página.
 export default function Header() {
+    // Herramientas para manipular los colores (oscuro/claro) y para saber quién es el usuario.
     const { toggleTheme } = useTheme()
     const { user, isLoggedIn, logout } = useAuth()
+
+    // Variables (memoria) que recuerdan si el menú de celular o el menú de perfil están abiertos en este momento.
     const [mobileOpen, setMobileOpen] = useState(false)
     const [dropdownOpen, setDropdownOpen] = useState(false)
     const location = useLocation()
     const navigate = useNavigate()
     const dropdownRef = useRef(null)
 
-    // Close dropdown on outside click
+    // Este efecto se da cuenta si el usuario da clic FUERA del menú de la foto,
+    // y si es así, lo cierra automáticamente para no estorbar.
     useEffect(() => {
         const handler = (e) => {
             if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
@@ -36,12 +43,13 @@ export default function Header() {
         return () => document.removeEventListener('mousedown', handler)
     }, [])
 
-    // Close dropdown on route change
+    //  Se asegura de cerrar todos los menús si el usuario acaba de cambiar a otra página nueva.
     useEffect(() => {
         setDropdownOpen(false)
         setMobileOpen(false)
     }, [location.pathname])
 
+    //  Cierra la cuenta del usuario y lo expulsa hacia la pantalla de iniciar sesión.
     const handleLogout = () => {
         logout()
         setDropdownOpen(false)
@@ -49,6 +57,7 @@ export default function Header() {
     }
 
     return (
+        // Barra física superior que persigue tu pantalla cuando bajas la página.
         <header className="sticky top-0 z-50 flex items-center justify-between whitespace-nowrap border-b border-solid border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark px-4 py-3 md:px-10 shadow-sm">
             <div className="flex items-center gap-4">
                 <Link to="/" className="flex items-center gap-3 cursor-pointer">
@@ -62,7 +71,7 @@ export default function Header() {
             </div>
 
             <div className="flex flex-1 justify-end gap-4 md:gap-8 items-center">
-                {/* Desktop Nav */}
+                {/* Menú de enlaces principales: Solo visible si tienes una pantalla grande de computadora */}
                 <nav className="hidden md:flex items-center gap-6 lg:gap-9">
                     {NAV_LINKS.map((link) => (
                         <Link
@@ -77,8 +86,7 @@ export default function Header() {
                         </Link>
                     ))}
                 </nav>
-
-                {/* Points badge */}
+                {/* Medalla que presume cuántos puntos tiene el usuario (solo aparece si tienes la sesión iniciada) */}
                 {isLoggedIn && (
                     <div className="hidden md:flex items-center gap-2 bg-gray-100 dark:bg-slate-800 px-3 py-1 rounded-full border border-border-light dark:border-border-dark">
                         <span className="material-symbols-outlined text-primary text-sm">savings</span>
@@ -89,7 +97,7 @@ export default function Header() {
                 )}
 
                 <div className="flex gap-2 items-center">
-                    {/* User avatar with dropdown OR Login button */}
+                    {/* Muestra la FOTO para tu sesión, o te da un BOTÓN si no tienes cuenta abierta */}
                     {isLoggedIn ? (
                         <div className="relative" ref={dropdownRef}>
                             <button
@@ -106,8 +114,7 @@ export default function Header() {
                                 />
                                 <div className="absolute -bottom-0.5 -right-0.5 size-3 bg-primary rounded-full border-2 border-surface-light dark:border-surface-dark" />
                             </button>
-
-                            {/* Dropdown */}
+                            {/* Este es el cuadrado oculto (menú) que se despliega al tocar la foto de perfil */}
                             {dropdownOpen && (
                                 <div className="absolute top-full right-0 mt-2 w-64 bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark rounded-2xl shadow-2xl overflow-hidden z-[200] animate-in fade-in slide-in-from-top-2">
                                     {/* User info header */}
@@ -163,6 +170,7 @@ export default function Header() {
                         </Link>
                     )}
 
+                    {/* Botón de tema: Permite cambiar a toda la página entre modo Claro y Oscuro (luna/sol) */}
                     <button
                         onClick={toggleTheme}
                         className="flex size-10 cursor-pointer items-center justify-center overflow-hidden rounded-lg bg-background-light dark:bg-border-dark text-text-main dark:text-text-light hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
@@ -170,6 +178,7 @@ export default function Header() {
                         <span className="material-symbols-outlined text-[20px]">contrast</span>
                     </button>
 
+                    {/* Únicamente aparece en celulares para revelar el menú escondido */}
                     <button
                         onClick={() => setMobileOpen(!mobileOpen)}
                         className="md:hidden flex size-10 cursor-pointer items-center justify-center overflow-hidden rounded-lg bg-background-light dark:bg-border-dark text-text-main dark:text-text-light"
@@ -181,7 +190,8 @@ export default function Header() {
                 </div>
             </div>
 
-            {/* Mobile Nav */}
+            {/* Mobile Nav  */}
+            {/* TODO ESTO es el menú secreto enorme que cae en teléfonos */}
             {mobileOpen && (
                 <div className="absolute top-[70px] right-4 left-4 md:hidden flex flex-col gap-1 bg-surface-light dark:bg-surface-dark p-4 rounded-2xl shadow-xl border border-border-light dark:border-border-dark z-[100]">
                     {isLoggedIn && (

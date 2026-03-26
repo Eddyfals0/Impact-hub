@@ -1,6 +1,8 @@
+/* Activa el paquete completo de TailwindCSS para poder usar sus clases (ej. text-center, bg-blue) */
 @import "tailwindcss";
 
 /* ─── Design Tokens ─── */
+/* Aquí guardamos nuestros colores y sombras del proyecto (modo claro y oscuro)  */
 @theme {
   --color-primary: #00d26a;
   --color-primary-dark: #00a855;
@@ -37,7 +39,9 @@
 }
 
 body {
+  /* Hace que cuando te desplaces a otra parte de la página el movimiento sea suave, no repentino */
   scroll-behavior: smooth;
+  /* Transición suave al cambiar entre modo oscuro y claro */
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
@@ -101,12 +105,14 @@ body {
   border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
+/* Modifica el color de remarcado cuando seleccionas texto con tu mouse */
 ::selection {
   background-color: var(--primary-color);
   color: #111813;
 }
 
 /* ─── Animations ─── */
+/* Crea un efecto visual de una imagen "flotando" arriba y abajo */
 @keyframes float {
   0% {
     transform: translateY(0px);

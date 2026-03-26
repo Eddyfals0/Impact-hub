@@ -1,24 +1,28 @@
 import { useState, useRef } from 'react'
 import { Link } from 'react-router-dom'
 
-/* ─── Data ─── */
+/* ─── Datos de Ejemplo ─── */
+// Lista de los 3 proyectos más exitosos que se mostrarán destacados en la parte superior.
 const TOP_PROJECTS = [
-    { id: 1, rank: 1, title: 'Agua Limpia Global', tag: '#SALUD', pct: 85, raised: '$42,500', goal: '$50,000', donors: 1240, img: 'https://images.unsplash.com/photo-1518391846015-55a9cc00ddb5?q=80&w=1200&auto=format&fit=crop', medal: '🥇', medalBg: 'from-yellow-400 to-amber-500', borderColor: 'border-yellow-400', glowColor: 'shadow-[0_0_40px_rgba(250,204,21,0.2)]' },
+    { id: 1, rank: 1, title: 'Agua Limpia Global', tag: '#SALUD', pct: 85, raised: '$42,500', goal: '$50,000', donors: 1240, img: '/images/water_global.png', medal: '🥇', medalBg: 'from-yellow-400 to-amber-500', borderColor: 'border-yellow-400', glowColor: 'shadow-[0_0_40px_rgba(250,204,21,0.2)]' },
     { id: 2, rank: 2, title: 'Escuelas Solares', tag: '#EDUCACIÓN', pct: 72, raised: '$25,200', goal: '$35,000', donors: 890, img: 'https://images.unsplash.com/photo-1497486751825-1233686d5d80?q=80&w=1200&auto=format&fit=crop', medal: '🥈', medalBg: 'from-gray-300 to-gray-400', borderColor: 'border-gray-300', glowColor: 'shadow-xl' },
     { id: 3, rank: 3, title: 'Viviendas Resilientes', tag: '#INFRAESTRUCTURA', pct: 58, raised: '$69,600', goal: '$120,000', donors: 650, img: 'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?q=80&w=1200&auto=format&fit=crop', medal: '🥉', medalBg: 'from-orange-400 to-orange-500', borderColor: 'border-orange-400', glowColor: 'shadow-xl' },
 ]
 
+// Lista completa de todos los proyectos disponibles en la plataforma para donar.
 const CATALOG_PROJECTS = [
     { id: 1, title: 'Paneles Solares Rurales', tag: 'ENERGÍA', tagColor: 'bg-yellow-500', pct: 78, raised: '$15,600', goal: '$20,000', donors: 340, desc: 'Instalación de paneles solares en comunidades sin acceso a red eléctrica convencional.', img: 'https://images.unsplash.com/photo-1509391366360-2e959784a276?q=80&w=1200&auto=format&fit=crop' },
     { id: 2, title: 'Luz para Aprender', tag: 'EDUCACIÓN', tagColor: 'bg-blue-500', pct: 40, raised: '$10,000', goal: '$25,000', donors: 180, desc: 'Instalación de paneles solares en escuelas rurales alejadas para salas de computación.', img: 'https://images.unsplash.com/photo-1511174511562-5f7f18b874f8?auto=format&fit=crop&q=80&w=800' },
-    { id: 3, title: 'Agua Limpia Comunidades', tag: 'SALUD', tagColor: 'bg-emerald-500', pct: 62, raised: '$9,300', goal: '$15,000', donors: 420, desc: 'Construcción de pozos de agua potable y sistemas de filtrado por ósmosis inversa.', img: 'https://images.unsplash.com/photo-1541544537156-7627a7a4aa1c?q=80&w=1200&auto=format&fit=crop' },
+    { id: 3, title: 'Agua Limpia Comunidades', tag: 'SALUD', tagColor: 'bg-emerald-500', pct: 62, raised: '$9,300', goal: '$15,000', donors: 420, desc: 'Construcción de pozos de agua potable y sistemas de filtrado por ósmosis inversa.', img: '/images/water_community.png' },
     { id: 4, title: 'Kits de Estudio Digital', tag: 'INFANCIA', tagColor: 'bg-pink-500', pct: 95, raised: '$4,750', goal: '$5,000', donors: 560, desc: 'Entrega de tabletas con contenido offline y paneles solares portátiles a escuelas.', img: 'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&q=80&w=800' },
     { id: 5, title: 'Microcréditos Impulso', tag: 'ECONOMÍA', tagColor: 'bg-violet-500', pct: 25, raised: '$3,000', goal: '$12,000', donors: 95, desc: 'Fondo rotatorio para financiar pequeños negocios liderados por mujeres emprendedoras.', img: 'https://images.unsplash.com/photo-1532629345422-7515f3d16bb6?auto=format&fit=crop&q=80&w=800' },
     { id: 6, title: 'Reforestación Amazónica', tag: 'AMBIENTE', tagColor: 'bg-green-600', pct: 55, raised: '$27,500', goal: '$50,000', donors: 710, desc: 'Plantación de árboles nativos y restauración de ecosistemas en la región amazónica.', img: 'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?q=80&w=1200&auto=format&fit=crop' },
 ]
 
+// Categorías por las cuales el usuario puede filtrar los proyectos (Salud, Educación, etc.)
 const FILTERS = ['Todos', 'Salud', 'Educación', 'Energía', 'Infancia', 'Economía', 'Ambiente']
 
+// Estadísticas globales de la plataforma para mostrar el impacto general.
 const STATS = [
     { icon: 'rocket_launch', value: '42', label: 'Proyectos Activos', color: 'text-primary', bg: 'bg-primary/10' },
     { icon: 'group', value: '12,450+', label: 'Donantes Globales', color: 'text-blue-500', bg: 'bg-blue-500/10' },
@@ -26,7 +30,9 @@ const STATS = [
     { icon: 'public', value: '18', label: 'Países Alcanzados', color: 'text-purple-500', bg: 'bg-purple-500/10' },
 ]
 
-/* ─── Sub-components ─── */
+/* ─── Componentes Internos ─── */
+// Este es el diseño de la "tarjeta" individual para cada proyecto.
+// Recibe un proyecto específico y dibuja su imagen, título, progreso y botón de donar.
 function ProjectCard({ project }) {
     return (
         <div className="flex flex-col bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark rounded-2xl overflow-hidden shadow-sm group hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
@@ -42,7 +48,7 @@ function ProjectCard({ project }) {
                 <h3 className="text-lg font-black text-text-main dark:text-text-light mb-1.5 group-hover:text-primary transition-colors">{project.title}</h3>
                 <p className="text-text-muted text-xs leading-relaxed line-clamp-2 mb-4">{project.desc}</p>
 
-                {/* Progress */}
+                {/* Barra de progreso visual que muestra cuánto falta para la meta */}
                 <div className="mt-auto space-y-3">
                     <div className="space-y-1.5">
                         <div className="flex justify-between items-end">
@@ -81,12 +87,17 @@ function ProjectCard({ project }) {
     )
 }
 
-/* ─── Main Page ─── */
+
+// Lista todos los proyectos disponibles para recibir donaciones.
+// Muestra la meta de cada uno y permite al usuario buscar y filtrar sugerencias por categorías.
 export default function ProyectosPage() {
+    // Variables para guardar lo que el usuario está buscando y la categoría que seleccionó.
     const [activeFilter, setActiveFilter] = useState('Todos')
     const [search, setSearch] = useState('')
     const sliderRef = useRef(null)
 
+    // Filtramos la lista principal de proyectos basándonos en si coinciden con
+    // el filtro de categoría o con el texto que el usuario escribió.
     const filteredProjects = CATALOG_PROJECTS.filter((p) => {
         const matchFilter = activeFilter === 'Todos' || p.tag.toLowerCase() === activeFilter.toLowerCase()
         const matchSearch = !search || p.title.toLowerCase().includes(search.toLowerCase()) || p.tag.toLowerCase().includes(search.toLowerCase())
@@ -96,6 +107,7 @@ export default function ProyectosPage() {
     return (
         <div className="flex flex-col items-center">
             {/* ═══ HERO ═══ */}
+            {/* Banner principal en la parte superior con título atractivo */}
             <section className="w-full relative overflow-hidden bg-gradient-to-br from-surface-light via-background-light to-surface-light dark:from-background-dark dark:via-surface-dark dark:to-background-dark border-b border-border-light dark:border-border-dark">
                 <div className="absolute inset-0 opacity-5 pointer-events-none">
                     <div className="absolute top-10 left-10 w-72 h-72 bg-primary rounded-full blur-3xl" />
@@ -142,6 +154,7 @@ export default function ProyectosPage() {
             </section>
 
             {/* ═══ TOP 3 RANKING ═══ */}
+            {/* Podio de los tres proyectos más exitosos actualmente */}
             <section className="w-full max-w-[1280px] px-4 md:px-10 py-12">
                 <div className="flex items-center gap-3 mb-8">
                     <div className="size-10 rounded-xl bg-yellow-500/10 flex items-center justify-center text-yellow-500">
@@ -212,6 +225,7 @@ export default function ProyectosPage() {
             </section>
 
             {/* ═══ SEARCH & FILTERS ═══ */}
+            {/* Barra buscadora y botones de filtro que se pegan a la pantalla al bajar */}
             <section className="w-full py-5 bg-surface-light/80 dark:bg-surface-dark/80 border-y border-border-light dark:border-border-dark sticky top-[72px] z-40 backdrop-blur-xl">
                 <div className="max-w-[1280px] mx-auto px-4 md:px-10">
                     <div className="flex flex-col lg:flex-row gap-4 items-center">
@@ -231,8 +245,8 @@ export default function ProyectosPage() {
                                     key={f}
                                     onClick={() => setActiveFilter(f)}
                                     className={`whitespace-nowrap px-4 py-2.5 rounded-xl font-bold text-xs transition-all ${activeFilter === f
-                                            ? 'bg-primary text-background-dark shadow-md shadow-primary/20'
-                                            : 'bg-background-light dark:bg-background-dark border border-border-light dark:border-border-dark hover:border-primary text-text-main dark:text-text-light'
+                                        ? 'bg-primary text-background-dark shadow-md shadow-primary/20'
+                                        : 'bg-background-light dark:bg-background-dark border border-border-light dark:border-border-dark hover:border-primary text-text-main dark:text-text-light'
                                         }`}
                                 >
                                     {f}
@@ -244,6 +258,7 @@ export default function ProyectosPage() {
             </section>
 
             {/* ═══ PROJECT CATALOG GRID ═══ */}
+            {/* Cuadrícula o galería donde se dibujan todos los proyectos ya filtrados */}
             <section className="w-full max-w-[1280px] px-4 md:px-10 py-12">
                 <div className="flex items-center justify-between mb-8">
                     <div className="flex items-center gap-3">
@@ -276,6 +291,7 @@ export default function ProyectosPage() {
             </section>
 
             {/* ═══ CTA BOTTOM ═══ */}
+            {/* Bloque final que invita al usuario a subir su propio proyecto */}
             <section className="w-full max-w-[1280px] px-4 md:px-10 pb-16">
                 <div className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-emerald-900 via-green-900 to-teal-900 p-8 md:p-12 text-white">
                     <div className="absolute inset-0 opacity-10">

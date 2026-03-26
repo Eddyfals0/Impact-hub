@@ -38,6 +38,8 @@ const INNOVATION_LAB = [
     { name: 'RecycleBot', cat: 'Hardware', desc: 'Robot autónomo recolector de PET.' },
 ]
 
+// Página informativa sobre la organización.
+// Explica cuál es el propósito real de Impact Hub y muestra a los desarrolladores detrás del sitio.
 export default function SobreNosotrosPage() {
     return (
         <div className="flex flex-col w-full bg-background-light dark:bg-background-dark overflow-hidden">

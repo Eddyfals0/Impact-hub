@@ -13,6 +13,9 @@ const PRODUCTS = [
     { id: 8, name: 'Pack Gaming LoL', pts: 3000, tag: 'GAMING', tagBg: 'bg-blue-600 text-white', icon: 'sports_esports', iconColor: 'text-yellow-400', brand: 'Riot Games' },
 ]
 
+// Tienda de recompensas de la plataforma.
+// Aquí el usuario canjea los Puntos de Impacto que ganó jugando o donando
+// por premios físicos y recompensas virtuales.
 export default function TiendaPage() {
     const [activeFilter, setActiveFilter] = useState('Todos')
 
@@ -84,8 +87,8 @@ export default function TiendaPage() {
                             key={f}
                             onClick={() => setActiveFilter(f)}
                             className={`whitespace-nowrap px-5 py-2.5 rounded-xl font-bold text-sm transition-all ${activeFilter === f
-                                    ? 'bg-primary text-background-dark shadow-lg shadow-primary/20'
-                                    : 'bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark hover:border-primary text-text-main dark:text-text-light'
+                                ? 'bg-primary text-background-dark shadow-lg shadow-primary/20'
+                                : 'bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark hover:border-primary text-text-main dark:text-text-light'
                                 }`}
                         >
                             {f}

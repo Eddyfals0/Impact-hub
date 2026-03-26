@@ -1,4 +1,6 @@
-# Logs
+# Lista de archivos y carpetas que Git NO debe subir a internet (como GitHub) por seguridad o por ser muy pesados.
+
+# Logs (Errores registrados)
 logs
 *.log
 npm-debug.log*
@@ -7,6 +9,8 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+# Carpetas muy pesadas o generadas automáticamente
+# La carpeta node_modules nunca se sube porque pesa mucho. Cada quien la descarga con 'npm install'.
 node_modules
 dist
 dist-ssr

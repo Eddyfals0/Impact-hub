@@ -1,8 +1,13 @@
 import { Link } from 'react-router-dom'
 
+// El Pie de Página.
+// Esta es la parte de "hasta abajo" que siempre ves en todas las pantallas.
+// Tiene los enlaces legales, de venta y redes sociales.
 export default function Footer() {
     return (
+        // Cuadro grande del fondo
         <footer className="flex flex-col gap-6 border-t border-solid border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark px-4 md:px-10 py-10 transition-colors">
+            {/* Primera sub-sección con dos partes principales */}
             <div className="flex flex-col md:flex-row justify-between gap-10">
                 <div className="flex flex-col gap-4">
                     <div className="flex items-center gap-3">
@@ -15,6 +20,7 @@ export default function Footer() {
                         La plataforma líder en micro-inversiones sociales para el cumplimiento de los ODS.
                     </p>
                 </div>
+                {/* Lado derecho: 3 columnas de pequeños enlaces importantes para navegar */}
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 gap-10">
                     <div className="flex flex-col gap-4">
                         <h3 className="text-text-main dark:text-text-light font-bold">Plataforma</h3>
@@ -35,6 +41,7 @@ export default function Footer() {
                     </div>
                 </div>
             </div>
+            {/* Franja final que tiene el "Copyright 2026" y los íconos pequeños de redes sociales */}
             <div className="border-t border-border-light dark:border-border-dark pt-6 flex flex-col md:flex-row justify-between items-center gap-4">
                 <p className="text-text-muted dark:text-gray-400 text-xs">© 2026 Impact Hub. Todos los derechos reservados.</p>
                 <div className="flex gap-4">

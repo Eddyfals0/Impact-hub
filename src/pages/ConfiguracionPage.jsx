@@ -6,6 +6,8 @@ const SAVED_CARDS = [
     { id: 2, brand: 'Mastercard', last4: '8832', exp: '03/26', icon: 'credit_card', color: 'from-red-500 to-orange-600' },
 ]
 
+// Panel de configuración general de la cuenta.
+// Permite al usuario editar su información personal, método de pago y cambiar la apariencia (tema).
 export default function ConfiguracionPage() {
     const { user } = useAuth()
 
@@ -59,8 +61,8 @@ export default function ConfiguracionPage() {
                                 key={tab.id}
                                 onClick={() => setActiveTab(tab.id)}
                                 className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium whitespace-nowrap transition-all ${activeTab === tab.id
-                                        ? 'bg-primary text-background-dark font-bold shadow-md shadow-primary/20'
-                                        : 'text-text-main dark:text-text-light hover:bg-primary/5 hover:text-primary'
+                                    ? 'bg-primary text-background-dark font-bold shadow-md shadow-primary/20'
+                                    : 'text-text-main dark:text-text-light hover:bg-primary/5 hover:text-primary'
                                     }`}
                             >
                                 <span className="material-symbols-outlined text-lg">{tab.icon}</span>

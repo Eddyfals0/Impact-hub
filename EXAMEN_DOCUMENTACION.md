@@ -75,6 +75,62 @@ CREATE TABLE projects (
     creator_id INTEGER REFERENCES users(id)
 );
 
--- Inserción de datos de prueba
-INSERT INTO users (name, email, points) VALUES ('Eduardo', 'eduardo@ejemplo.com', 5800);
+-- Inserción de datos de prueba (Mínimo 5 por tabla)
+INSERT INTO users (name, email, points, avatar) VALUES 
+('Eduardo Guerra', 'eduardo@hub.com', 5800, 'https://i.pravatar.cc/100?u=1'),
+('Ana López', 'ana@causa.org', 4200, 'https://i.pravatar.cc/100?u=2'),
+('Roberto Sanz', 'roberto@impacto.net', 1500, 'https://i.pravatar.cc/100?u=3'),
+('Lucía Méndez', 'lucia@ong.com', 8900, 'https://i.pravatar.cc/100?u=4'),
+('Carlos Ruiz', 'carlos@social.io', 3100, 'https://i.pravatar.cc/100?u=5');
+
+INSERT INTO projects (title, description, goal, raised, creator_id) VALUES 
+('Agua Limpia Global', 'Pozos de agua en zonas rurales.', 50000, 42500, 1),
+('Escuelas Solares', 'Energía limpia para educación.', 35000, 25200, 1),
+('Viviendas Resilientes', 'Construcción modular segura.', 120000, 69600, 2),
+('Paneles Rurales', 'Kits solares para hogares.', 20000, 15600, 4),
+('Reforestación Activa', 'Siembra de árboles nativos.', 50000, 27500, 5);
+
+---
+
+## 4. Consultas y Resultados
+
+### Consulta 1: Obtener todos los proyectos con el nombre de su creador (Relación)
+```sql
+SELECT p.title, p.raised, u.name as creador
+FROM projects p
+JOIN users u ON p.creator_id = u.id;
+```
+
+### Consulta 2: Proyectos que han superado el 50% de su meta
+```sql
+SELECT title, raised, goal 
+FROM projects 
+WHERE raised > (goal / 2);
+```
+
+### Consulta 3: Top 3 usuarios con más Puntos de Impacto
+```sql
+SELECT name, points 
+FROM users 
+ORDER BY points DESC 
+LIMIT 3;
+```
+
+---
+
+## 5. Justificación del Diseño de Tablas
+Se diseñaron estas dos tablas relacionadas para separar la entidad **Usuario** de la entidad **Proyecto**.
+- La tabla `users` centraliza los datos de perfil y gamificación (puntos).
+- La tabla `projects` almacena la información técnica y financiera de cada iniciativa.
+- La relación **1:N (Uno a Muchos)** permite que un usuario pueda ser autor de múltiples proyectos, manteniendo la integridad referencial mediante una llave foránea (`creator_id`).
+
+---
+
+## 6. Conclusión Personal
+
+### ¿Qué dificultades tuvo durante el proceso?
+La principal dificultad fue la integración de la base de datos en tiempo real con funciones serverless de Netlify, asegurando que la conexión fuera rápida y segura sin necesidad de un servidor dedicado permanente. También la resolución de problemas de configuración en el archivo `package.json` para el despliegue automático.
+
+### ¿Qué aprendió?
+Aprendí a implementar una arquitectura Fullstack moderna utilizando frameworks ligeros como Hono y ORMs eficientes como Drizzle. También comprendí la importancia de separar las responsabilidades mediante el patrón MVC para facilitar el mantenimiento y la escalabilidad de aplicaciones web en la nube.
 ```

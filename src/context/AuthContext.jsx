@@ -5,17 +5,6 @@ const AuthContext = createContext()
 // Atajo para usar la información de inicio de sesión en cualquier parte.
 export const useAuth = () => useContext(AuthContext)
 
-<<<<<<< HEAD
-const MOCK_USER = {
-    name: 'Eduardo',
-    avatar: 'https://i.pravatar.cc/100?u=eduardo',
-    points: 5800,
-}
-
-// Guarda y reparte la información del usuario conectado
-// a todas las páginas de la plataforma que la necesiten.
-=======
->>>>>>> 195a56f (feat: implement serverless backend with Netlify Functions, Hono, Drizzle and Neon DB)
 export function AuthProvider({ children }) {
     const [user, setUser] = useState(null)
     const [isLoading, setIsLoading] = useState(true)

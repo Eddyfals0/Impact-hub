@@ -15,6 +15,9 @@ import SobreNosotrosPage from './pages/SobreNosotrosPage'
 
 import ScrollToTop from './components/ScrollToTop'
 
+// Organizador principal de la aplicación.
+// Define qué página se muestra según la dirección web (ruta).
+// También envuelve todo el proyecto para compartir los datos del usuario y el tema.
 export default function App() {
   return (
     <AuthProvider>

@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { Link } from 'react-router-dom'
 
+// Pantalla del minijuego ("Globo de la Esperanza").
+// Permite a los usuarios entretenerse mientras ayudan a conseguir más fondos.
 export default function JuegoPage() {
     const canvasRef = useRef(null)
     const [score, setScore] = useState(0)

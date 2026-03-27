@@ -2,10 +2,13 @@
 <html lang="es">
 
 <head>
+  <!-- Configuraciones básicas para que el navegador reconozca y lea correctamente la página -->
   <meta charset="UTF-8" />
   <link rel="icon" type="image/svg+xml" href="/vite.svg" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- Título que verán los usuarios en la pestaña de su navegador -->
   <title>Impact Hub 2026</title>
+  <!-- Aquí importamos las fuentes web (como Manrope o Exo 2) desde Google Fonts -->
   <link
     href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&family=Noto+Sans:wght@400;500;700&family=Exo+2:wght@400;700;800;900&family=Outfit:wght@900&display=swap"
     rel="stylesheet" />
@@ -15,7 +18,9 @@
 
 <body
   class="bg-background-light dark:bg-background-dark text-text-main dark:text-text-light font-display transition-colors duration-200">
+  <!-- Dentro de este contenedor "root" es donde React inyectará toda la página web -->
   <div id="root"></div>
+  <!-- Archivo de JavaScript principal que arranca la aplicación de React -->
   <script type="module" src="/src/main.jsx"></script>
 </body>
 

@@ -33,6 +33,8 @@ const CONTRIBUTIONS = [
     { id: '#55102', project: 'Viviendas Resilientes', date: '01 Sep 2024', tag: 'Infraestructura', tagIcon: 'home', tagColor: 'bg-purple-50 dark:bg-purple-900/20 text-purple-700 dark:text-purple-300 border-purple-100 dark:border-purple-900/30', amount: '$1,000.00' },
 ]
 
+// Panel personal del usuario (Perfil).
+// Muestra su historial de donaciones, insignias obtenidas y su nivel actual de impacto.
 export default function UserPage() {
     const xpPct = Math.round((USER.xp / USER.xpNext) * 100)
 
@@ -209,10 +211,10 @@ export default function UserPage() {
                                     <div
                                         key={b.name}
                                         className={`group flex flex-col items-center text-center p-4 rounded-xl transition-all cursor-pointer border ${b.active
-                                                ? b.special
-                                                    ? 'bg-indigo-50 dark:bg-indigo-900/10 hover:bg-indigo-100 dark:hover:bg-indigo-900/20 border-transparent hover:border-indigo-500/30'
-                                                    : 'bg-gray-50 dark:bg-white/5 hover:bg-primary/5 border-transparent hover:border-primary/30'
-                                                : 'bg-gray-50 dark:bg-white/5 border-transparent opacity-50 grayscale'
+                                            ? b.special
+                                                ? 'bg-indigo-50 dark:bg-indigo-900/10 hover:bg-indigo-100 dark:hover:bg-indigo-900/20 border-transparent hover:border-indigo-500/30'
+                                                : 'bg-gray-50 dark:bg-white/5 hover:bg-primary/5 border-transparent hover:border-primary/30'
+                                            : 'bg-gray-50 dark:bg-white/5 border-transparent opacity-50 grayscale'
                                             }`}
                                     >
                                         <div className={`bg-white dark:bg-white/10 shadow-sm ${b.color} rounded-full p-3 mb-3 ${b.active ? 'group-hover:scale-110' : ''} transition-transform`}>

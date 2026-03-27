@@ -1,7 +1,10 @@
 import { Link } from 'react-router-dom'
 
+// Pantalla de inicio de sesión y registro.
+// Aquí los usuarios ingresan a su cuenta para guardar su progreso y puntos.
 export default function LoginPage() {
     return (
+        // Envoltorio principal que centra el formulario en mitad de la pantalla
         <div className="flex-grow flex items-center justify-center px-4 py-8 relative overflow-hidden">
             {/* Background blobs */}
             <div className="absolute top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none">
@@ -11,6 +14,7 @@ export default function LoginPage() {
 
             <div className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
                 {/* Left image panel */}
+                {/* Cuadro a la izquierda: Muestra una imagen bonita. Se oculta en teléfonos pequeños. */}
                 <div className="relative hidden lg:flex flex-col h-[450px] rounded-[1.5rem] overflow-hidden group shadow-2xl">
                     <div
                         className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105"
@@ -38,6 +42,7 @@ export default function LoginPage() {
                 </div>
 
                 {/* Right form */}
+                {/* Cuadro a la derecha: Contiene el formulario como tal */}
                 <div className="flex flex-col justify-center max-w-md mx-auto w-full py-2">
                     <div className="mb-4">
                         <h1 className="text-xl font-black text-text-main dark:text-white mb-1 leading-tight">Únete a la Misión</h1>
@@ -45,6 +50,7 @@ export default function LoginPage() {
                     </div>
 
                     <div className="grid grid-cols-2 gap-3 mb-4">
+                        {/* Botones de inicio de sesión rápido con redes sociales */}
                         <button className="flex items-center justify-center gap-2 bg-[#0077b5] hover:bg-[#006097] text-white h-11 rounded-full font-bold shadow-md transition-all transform hover:-translate-y-0.5 text-xs px-2">
                             <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 21.227.792 22 1.771 22h20.451C23.2 22 24 21.227 24 20.271V1.729C24 .774 23.2 0 22.225 0z" /></svg>
                             <span>LinkedIn</span>
@@ -61,6 +67,7 @@ export default function LoginPage() {
                         <div className="flex-grow border-t border-gray-200 dark:border-gray-700" />
                     </div>
 
+                    {/* Formulario donde los usuarios escriben su correo y contraseña */}
                     <form className="space-y-3" onSubmit={(e) => e.preventDefault()}>
                         <label className="block relative group/input">
                             <span className="absolute left-4 top-3 text-gray-400 group-focus-within/input:text-primary transition-colors">
@@ -75,6 +82,7 @@ export default function LoginPage() {
                             <input className="w-full bg-white dark:bg-gray-800 border-none ring-1 ring-gray-200 dark:ring-gray-700 focus:ring-2 focus:ring-primary rounded-full py-2 pl-12 pr-12 text-slate-900 dark:text-white placeholder-gray-400 transition-all shadow-sm h-11 text-sm" placeholder="Contraseña" type="password" />
                         </label>
                         <div className="flex items-center justify-between text-[11px] px-2">
+                            {/* Casilla para recordar al usuario la próxima vez */}
                             <label className="flex items-center gap-2 cursor-pointer group">
                                 <input className="h-5 w-5 cursor-pointer appearance-none rounded-md border border-gray-300 transition-all checked:border-primary checked:bg-primary" type="checkbox" />
                                 <span className="text-gray-600 dark:text-gray-400 group-hover:text-gray-800 dark:group-hover:text-gray-200">Recordarme</span>

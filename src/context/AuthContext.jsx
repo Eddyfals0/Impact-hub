@@ -2,6 +2,7 @@ import { createContext, useContext, useState } from 'react'
 
 const AuthContext = createContext()
 
+// Atajo para usar la información de inicio de sesión en cualquier parte.
 export const useAuth = () => useContext(AuthContext)
 
 const MOCK_USER = {
@@ -10,6 +11,8 @@ const MOCK_USER = {
     points: 5800,
 }
 
+// Guarda y reparte la información del usuario conectado
+// a todas las páginas de la plataforma que la necesiten.
 export function AuthProvider({ children }) {
     const [user, setUser] = useState(MOCK_USER)
 

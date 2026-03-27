@@ -20,6 +20,8 @@ const BADGES = [
     { icon: 'lock', color: 'text-gray-400', bg: 'bg-gray-100 dark:bg-gray-800 border-2 border-dashed border-gray-300 dark:border-gray-600', tooltip: 'Bloqueado', locked: true },
 ]
 
+// Tabla de líderes o clasificación general.
+// Muestra la lista de los usuarios que tienen más puntos para alentar la donación.
 export default function RankingPage() {
     const [activeTab, setActiveTab] = useState('Global')
 

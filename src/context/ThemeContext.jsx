@@ -2,8 +2,11 @@ import { createContext, useContext, useState, useEffect } from 'react'
 
 const ThemeContext = createContext()
 
+// Atajo para controlar los colores (Claro / Oscuro) desde cualquier página.
 export const useTheme = () => useContext(ThemeContext)
 
+// Guarda la preferencia de diseño del usuario (iluminado u oscuro).
+// Recuerda esta decisión en el navegador para cuando vuelva a entrar a la web.
 export function ThemeProvider({ children }) {
     const [isDark, setIsDark] = useState(() => {
         const saved = localStorage.getItem('theme')

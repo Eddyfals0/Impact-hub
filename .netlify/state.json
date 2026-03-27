@@ -1,0 +1,20 @@
+{
+	"geolocation": {
+		"data": {
+			"city": "Valladolid",
+			"country": {
+				"code": "MX",
+				"name": "Mexico"
+			},
+			"subdivision": {
+				"code": "YUC",
+				"name": "Yucatán"
+			},
+			"timezone": "America/Merida",
+			"latitude": 20.6768,
+			"longitude": -88.1614,
+			"postalCode": "97795"
+		},
+		"timestamp": 1774565279632
+	}
+}

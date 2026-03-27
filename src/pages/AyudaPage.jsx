@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 
+// Lista de preguntas frecuentes separadas por sección (General, Donaciones, Puntos, etc.)
+// Esto guarda la información que luego se mostrará en pantalla.
 const FAQ_CATEGORIES = [
     {
         id: 'general',
@@ -54,14 +56,19 @@ const FAQ_CATEGORIES = [
     },
 ]
 
+// Centro de ayuda y preguntas frecuentes.
+// Explica a los usuarios cómo usar la plataforma y tiene áreas para contactar a soporte.
 export default function AyudaPage() {
+    // Variables temporales (memoria) para recordar la sección actual,
+    // la pregunta que el usuario ha abierto, y lo que haya escrito en el buscador.
     const [activeCategory, setActiveCategory] = useState('general')
     const [openQuestion, setOpenQuestion] = useState(null)
     const [searchQuery, setSearchQuery] = useState('')
 
     const currentCategory = FAQ_CATEGORIES.find((c) => c.id === activeCategory)
 
-    // Filter by search
+    // Lógica para filtrar las preguntas dependiendo de si el usuario
+    // escribió algo en la barra de búsqueda o no.
     const filteredQuestions = searchQuery
         ? FAQ_CATEGORIES.flatMap((cat) =>
             cat.questions
@@ -70,6 +77,7 @@ export default function AyudaPage() {
         )
         : currentCategory?.questions || []
 
+    // Función que se encarga de abrir o cerrar una pregunta al hacerle clic.
     const toggleQuestion = (idx) => {
         setOpenQuestion(openQuestion === idx ? null : idx)
     }
@@ -77,6 +85,7 @@ export default function AyudaPage() {
     return (
         <div className="flex-grow w-full px-4 md:px-10 py-8 max-w-[1280px] mx-auto">
             {/* Hero */}
+            {/* Cabecera grande con colores y el buscador de preguntas */}
             <div className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-surface-light via-primary/5 to-surface-light dark:from-surface-dark dark:via-primary/10 dark:to-surface-dark border border-border-light dark:border-border-dark p-8 md:p-12 mb-8">
                 <div className="absolute inset-0 opacity-5 pointer-events-none">
                     <div className="absolute top-0 right-0 w-72 h-72 bg-primary rounded-full blur-3xl" />
@@ -109,6 +118,7 @@ export default function AyudaPage() {
 
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
                 {/* ─── Category sidebar ─── */}
+                {/* Menú lateral con botones para elegir la categoría (solo se muestra si no estás buscando) */}
                 {!searchQuery && (
                     <aside className="lg:col-span-3">
                         <nav className="flex lg:flex-col gap-2 overflow-x-auto lg:overflow-visible pb-2 lg:pb-0 no-scrollbar">
@@ -117,8 +127,8 @@ export default function AyudaPage() {
                                     key={cat.id}
                                     onClick={() => { setActiveCategory(cat.id); setOpenQuestion(null) }}
                                     className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium whitespace-nowrap transition-all ${activeCategory === cat.id
-                                            ? 'bg-primary text-background-dark font-bold shadow-md shadow-primary/20'
-                                            : 'text-text-main dark:text-text-light hover:bg-primary/5 hover:text-primary'
+                                        ? 'bg-primary text-background-dark font-bold shadow-md shadow-primary/20'
+                                        : 'text-text-main dark:text-text-light hover:bg-primary/5 hover:text-primary'
                                         }`}
                                 >
                                     <span className="material-symbols-outlined text-lg">{cat.icon}</span>
@@ -134,6 +144,7 @@ export default function AyudaPage() {
                 )}
 
                 {/* ─── Questions ─── */}
+                {/* Área derecha donde se muestra la lista de las preguntas en sí */}
                 <div className={searchQuery ? 'lg:col-span-12' : 'lg:col-span-9'}>
                     {searchQuery && (
                         <p className="text-sm text-text-muted mb-4 font-medium">
@@ -142,12 +153,13 @@ export default function AyudaPage() {
                     )}
 
                     <div className="space-y-3">
+                        {/* Ciclo que dibuja una por una las preguntas en forma de tarjetas desplegables */}
                         {filteredQuestions.map((q, idx) => (
                             <div
                                 key={idx}
                                 className={`bg-surface-light dark:bg-surface-dark border rounded-2xl overflow-hidden transition-all ${openQuestion === idx
-                                        ? 'border-primary/40 shadow-md shadow-primary/5'
-                                        : 'border-border-light dark:border-border-dark hover:border-primary/20'
+                                    ? 'border-primary/40 shadow-md shadow-primary/5'
+                                    : 'border-border-light dark:border-border-dark hover:border-primary/20'
                                     }`}
                             >
                                 <button
@@ -203,6 +215,7 @@ export default function AyudaPage() {
             </div>
 
             {/* ─── Contact CTA ─── */}
+            {/* Bloque final (Call to Action) que invita a escribir a soporte si no encontraste respuesta */}
             <div className="mt-12 mb-4 rounded-3xl overflow-hidden bg-gradient-to-br from-emerald-900 via-green-900 to-teal-900 p-8 md:p-12 text-white relative">
                 <div className="absolute inset-0 opacity-10">
                     <div className="absolute top-0 right-0 w-96 h-96 bg-primary rounded-full blur-3xl" />

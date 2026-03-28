@@ -5,6 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:api": "tsx server/dev-api.ts",
+    "dev:full": "pwsh -NoProfile -ExecutionPolicy Bypass -Command \"$api = Start-Process npm -ArgumentList 'run dev:api' -PassThru; npm run dev; Stop-Process -Id $api.Id -Force\"",
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview"
@@ -32,7 +34,6 @@
     "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-react-refresh": "^0.4.24",
     "globals": "^16.5.0",
-    "ts-node": "^10.9.2",
     "tsx": "^4.21.0",
     "vite": "^8.0.3"
   }

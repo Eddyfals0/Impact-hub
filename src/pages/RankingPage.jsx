@@ -45,7 +45,7 @@ export default function RankingPage() {
             {/* Podium */}
             <section className="w-full max-w-[1280px] mx-auto px-4 md:px-10 -mt-10 mb-16 relative z-20">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-end">
-                    {PODIUM.map((p, i) => {
+                    {PODIUM.map((p) => {
                         const isFirst = p.rank === 1
                         return (
                             <div key={p.rank} className={`flex flex-col items-center ${isFirst ? 'order-1 md:order-2' : p.rank === 2 ? 'order-2 md:order-1' : 'order-3'}`}>

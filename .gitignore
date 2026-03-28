@@ -16,6 +16,9 @@ dist
 dist-ssr
 *.local
 
+# Archivos de lock no usados en este proyecto
+deno.lock
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
@@ -29,6 +32,10 @@ dist-ssr
 
 # Local Netlify folder
 .netlify
+
+# Netlify Functions build artifacts
+netlify/functions/*.zip
+netlify/functions/manifest.json
 
 # Environment variables
 .env

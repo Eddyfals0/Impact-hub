@@ -92,8 +92,7 @@ Este documento detalla exhaustivamente cada archivo y directorio que compone el 
 ### 📄 Archivos Principales
 *   **`main.jsx`**: Es el punto de entrada de React. Se encarga de tomar el componente `<App />`, envolverlo con `<BrowserRouter>` (para el enrutamiento) y renderizarlo dentro del `index.html`.
 *   **`App.jsx`**: El componente base que agrupa toda la aplicación. Aquí se configuran todas las rutas (`<Route>`) utilizando React Router, definiendo qué página mostrar dependiendo de la URL (ej: `/login` renderiza `LoginPage`). También envuelve la aplicación en los *Providers* globales (`AuthProvider` y `ThemeProvider`).
-*   **`index.css`**: Hoja de estilos principal del proyecto. Aquí se importan las directivas y utilidades base de TailwindCSS (`@tailwind base; @tailwind components; @tailwind utilities;`).
-*   **`App.css`**: Hoja de estilos secundaria, generalmente utilizada para estilos específicos de componentes que no se pudieron resolver fácilmente con clases utilitarias de Tailwind.
+*   **`index.css`**: Hoja de estilos principal del proyecto. Aquí se carga TailwindCSS y se definen tokens/estilos globales (scrollbar, utilidades, animaciones).
 
 ### 📁 Componentes Reutilizables (`/src/components/`)
 *   **`Header.jsx`**: Componente de navegación superior. Muestra el logo de Impact Hub, los enlaces a diferentes páginas (Proyectos, Ranking, Tienda) y el acceso al perfil del usuario.

@@ -43,12 +43,6 @@ export default function Header() {
         return () => document.removeEventListener('mousedown', handler)
     }, [])
 
-    //  Se asegura de cerrar todos los menús si el usuario acaba de cambiar a otra página nueva.
-    useEffect(() => {
-        setDropdownOpen(false)
-        setMobileOpen(false)
-    }, [location.pathname])
-
     //  Cierra la cuenta del usuario y lo expulsa hacia la pantalla de iniciar sesión.
     const handleLogout = () => {
         logout()

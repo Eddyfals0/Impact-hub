@@ -36,6 +36,9 @@ export default function LoginPage() {
                 const response = await fetch('/api/auth/google/client-id')
                 if (!response.ok) return
 
+                const contentType = response.headers.get('content-type') || ''
+                if (!contentType.includes('application/json')) return
+
                 const data = await response.json()
                 if (data?.clientId) {
                     setGoogleClientId(data.clientId)

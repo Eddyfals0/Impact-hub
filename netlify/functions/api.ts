@@ -6,7 +6,7 @@ import { eq } from 'drizzle-orm';
 import { compare, hash } from 'bcryptjs';
 import { OAuth2Client } from 'google-auth-library';
 
-const app = new Hono().basePath('/api');
+export const app = new Hono().basePath('/api');
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 const normalizeEmail = (email: string) => email.trim().toLowerCase();

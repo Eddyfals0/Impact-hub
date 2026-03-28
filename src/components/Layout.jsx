@@ -1,4 +1,4 @@
-import { Outlet } from 'react-router-dom'
+import { Outlet, useLocation } from 'react-router-dom'
 import Header from './Header'
 import Footer from './Footer'
 
@@ -6,9 +6,11 @@ import Footer from './Footer'
 // Muestra el menú de navegación arriba (Header), el pie de página abajo (Footer),
 // y en el centro (<Outlet />) muestra el contenido de la página en la que estás.
 export default function Layout() {
+    const location = useLocation()
+
     return (
         <div className="relative flex h-auto min-h-screen w-full flex-col overflow-x-hidden">
-            <Header />
+            <Header key={location.pathname} />
             <main className="flex-1 flex flex-col">
                 <Outlet />
             </main>

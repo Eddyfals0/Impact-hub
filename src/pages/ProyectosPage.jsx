@@ -1,5 +1,4 @@
-import { useState, useRef } from 'react'
-import { Link } from 'react-router-dom'
+import { useState } from 'react'
 
 /* ─── Datos de Ejemplo ─── */
 // Lista de los 3 proyectos más exitosos que se mostrarán destacados en la parte superior.
@@ -94,7 +93,6 @@ export default function ProyectosPage() {
     // Variables para guardar lo que el usuario está buscando y la categoría que seleccionó.
     const [activeFilter, setActiveFilter] = useState('Todos')
     const [search, setSearch] = useState('')
-    const sliderRef = useRef(null)
 
     // Filtramos la lista principal de proyectos basándonos en si coinciden con
     // el filtro de categoría o con el texto que el usuario escribió.

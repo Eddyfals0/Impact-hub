@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 import { createContext, useContext, useState, useEffect } from 'react'
 
 const AuthContext = createContext()
@@ -36,6 +37,18 @@ export function AuthProvider({ children }) {
         })
     }
 
+    const readApiPayload = async (response) => {
+        const contentType = response.headers.get('content-type') || ''
+        if (contentType.includes('application/json')) {
+            return response.json()
+        }
+
+        const text = await response.text()
+        return {
+            error: text || 'El servidor devolvio una respuesta invalida',
+        }
+    }
+
     useEffect(() => {
         const fetchUser = async () => {
             const storedId = localStorage.getItem(SESSION_USER_ID_KEY)
@@ -71,7 +84,7 @@ export function AuthProvider({ children }) {
             body: JSON.stringify({ email, password }),
         })
 
-        const data = await res.json()
+        const data = await readApiPayload(res)
         if (!res.ok) {
             const message = data?.error || 'No fue posible iniciar sesión'
             setAuthError(message)
@@ -90,7 +103,7 @@ export function AuthProvider({ children }) {
             body: JSON.stringify({ name, email, password }),
         })
 
-        const data = await res.json()
+        const data = await readApiPayload(res)
         if (!res.ok) {
             const message = data?.error || 'No fue posible crear la cuenta'
             setAuthError(message)
@@ -109,7 +122,7 @@ export function AuthProvider({ children }) {
             body: JSON.stringify({ idToken }),
         })
 
-        const data = await res.json()
+        const data = await readApiPayload(res)
         if (!res.ok) {
             const message = data?.error || 'No fue posible iniciar con Google'
             setAuthError(message)

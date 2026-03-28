@@ -19,6 +19,9 @@ dist-ssr
 # Archivos de lock no usados en este proyecto
 deno.lock
 
+# Scripts locales (solo para pruebas)
+scripts/seed-sample-data.mjs
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

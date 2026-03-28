@@ -1,10 +1,16 @@
 // Archivo de configuración de Vite.
+import fs from 'node:fs'
+import path from 'node:path'
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 
+const projectRoot = fs.realpathSync(process.cwd())
+
 // https://vite.dev/config/
 export default defineConfig({
+  root: projectRoot,
+  cacheDir: path.join(projectRoot, 'node_modules/.vite'),
   plugins: [
     react(),
     tailwindcss(),

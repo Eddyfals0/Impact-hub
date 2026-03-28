@@ -3,34 +3,235 @@ import { handle } from 'hono/netlify';
 import { db } from '../../src/db';
 import { users, projects } from '../../src/db/schema';
 import { eq } from 'drizzle-orm';
+import { compare, hash } from 'bcryptjs';
+import { OAuth2Client } from 'google-auth-library';
 
 const app = new Hono().basePath('/api');
+const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+
+const normalizeEmail = (email: string) => email.trim().toLowerCase();
+
+const defaultAvatarFor = (name: string, email: string) => {
+  const seed = encodeURIComponent(`${name || email}`);
+  return `https://i.pravatar.cc/100?u=${seed}`;
+};
+
+const toPublicUser = (user: typeof users.$inferSelect) => ({
+  id: user.id,
+  name: user.name,
+  email: user.email,
+  avatar: user.avatar,
+  points: user.points ?? 0,
+  authProvider: user.authProvider,
+  role: user.role,
+  country: user.country,
+  bio: user.bio,
+  isEmailVerified: user.isEmailVerified,
+  createdAt: user.createdAt,
+  updatedAt: user.updatedAt,
+});
+
+const parseUserIdHeader = (rawUserId: string | undefined): number | null => {
+  if (!rawUserId) return null;
+  const parsed = Number(rawUserId);
+  if (!Number.isInteger(parsed) || parsed <= 0) return null;
+  return parsed;
+};
+
+const slugify = (value: string) =>
+  value
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9\s-]/g, '')
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-');
 
 // Test route
 app.get('/hello', (c) => {
   return c.json({ message: 'Hello from Netlify Functions + Hono!' });
 });
 
-// Auth Simulation (Mocking a logged-in user for now, fetching from Neon)
+// Current user
 app.get('/auth/me', async (c) => {
   try {
-    // For demonstration, let's just get the first user or return a hardcoded one if none
-    const allUsers = await db.select().from(users).limit(1);
-    
-    if (allUsers.length > 0) {
-      return c.json(allUsers[0]);
+    const userId = parseUserIdHeader(c.req.header('x-user-id'));
+    if (!userId) {
+      return c.json({ error: 'Unauthenticated' }, 401);
     }
-    
-    // Fallback if DB is empty
-    return c.json({
-      name: 'Eduardo (DB Empty)',
-      avatar: 'https://i.pravatar.cc/100?u=eduardo',
-      points: 5800,
-      email: 'eduardo@test.com'
-    });
+
+    const matched = await db.select().from(users).where(eq(users.id, userId)).limit(1);
+    if (!matched.length) {
+      return c.json({ error: 'User not found' }, 404);
+    }
+
+    return c.json(toPublicUser(matched[0]));
   } catch (error: any) {
-    console.error("DB Error:", error);
+    console.error('DB Error:', error);
     return c.json({ error: error.message }, 500);
+  }
+});
+
+// Register with email + password
+app.post('/auth/register', async (c) => {
+  try {
+    const body = await c.req.json();
+    const name = String(body?.name ?? '').trim();
+    const email = normalizeEmail(String(body?.email ?? ''));
+    const password = String(body?.password ?? '');
+
+    if (!name || !email || !password) {
+      return c.json({ error: 'name, email and password are required' }, 400);
+    }
+    if (password.length < 8) {
+      return c.json({ error: 'Password must contain at least 8 characters' }, 400);
+    }
+
+    const existing = await db.select().from(users).where(eq(users.email, email)).limit(1);
+    if (existing.length && existing[0].passwordHash) {
+      return c.json({ error: 'Email already registered' }, 409);
+    }
+
+    const passwordHash = await hash(password, 10);
+    const now = new Date();
+
+    let userRecord: typeof users.$inferSelect;
+
+    if (existing.length) {
+      const updated = await db
+        .update(users)
+        .set({
+          name,
+          passwordHash,
+          authProvider: 'email',
+          avatar: existing[0].avatar || defaultAvatarFor(name, email),
+          updatedAt: now,
+        })
+        .where(eq(users.id, existing[0].id))
+        .returning();
+      userRecord = updated[0];
+    } else {
+      const inserted = await db
+        .insert(users)
+        .values({
+          name,
+          email,
+          passwordHash,
+          authProvider: 'email',
+          avatar: defaultAvatarFor(name, email),
+          points: 0,
+          isEmailVerified: false,
+        })
+        .returning();
+      userRecord = inserted[0];
+    }
+
+    return c.json(toPublicUser(userRecord), 201);
+  } catch (error: any) {
+    return c.json({ error: error.message }, 500);
+  }
+});
+
+// Login with email + password
+app.post('/auth/login', async (c) => {
+  try {
+    const body = await c.req.json();
+    const email = normalizeEmail(String(body?.email ?? ''));
+    const password = String(body?.password ?? '');
+
+    if (!email || !password) {
+      return c.json({ error: 'email and password are required' }, 400);
+    }
+
+    const matched = await db.select().from(users).where(eq(users.email, email)).limit(1);
+    if (!matched.length || !matched[0].passwordHash) {
+      return c.json({ error: 'Invalid credentials' }, 401);
+    }
+
+    const valid = await compare(password, matched[0].passwordHash);
+    if (!valid) {
+      return c.json({ error: 'Invalid credentials' }, 401);
+    }
+
+    const refreshed = await db
+      .update(users)
+      .set({ updatedAt: new Date() })
+      .where(eq(users.id, matched[0].id))
+      .returning();
+
+    return c.json(toPublicUser(refreshed[0]));
+  } catch (error: any) {
+    return c.json({ error: error.message }, 500);
+  }
+});
+
+// Login/Register with Google id_token
+app.post('/auth/google', async (c) => {
+  try {
+    const body = await c.req.json();
+    const idToken = String(body?.idToken ?? '');
+    if (!idToken) {
+      return c.json({ error: 'idToken is required' }, 400);
+    }
+
+    const audience = process.env.GOOGLE_CLIENT_ID || process.env.VITE_GOOGLE_CLIENT_ID;
+    if (!audience) {
+      return c.json({ error: 'Google auth is not configured on server' }, 500);
+    }
+    const ticket = await googleClient.verifyIdToken({
+      idToken,
+      audience,
+    });
+
+    const payload = ticket.getPayload();
+    if (!payload?.sub || !payload?.email) {
+      return c.json({ error: 'Invalid Google token payload' }, 401);
+    }
+
+    const email = normalizeEmail(payload.email);
+    const name = payload.name?.trim() || email.split('@')[0] || 'Impact User';
+    const avatar = payload.picture || defaultAvatarFor(name, email);
+    const now = new Date();
+
+    let matchedByGoogle = await db.select().from(users).where(eq(users.googleSub, payload.sub)).limit(1);
+    if (!matchedByGoogle.length) {
+      matchedByGoogle = await db.select().from(users).where(eq(users.email, email)).limit(1);
+    }
+
+    let userRecord: typeof users.$inferSelect;
+    if (matchedByGoogle.length) {
+      const updated = await db
+        .update(users)
+        .set({
+          name,
+          email,
+          avatar,
+          authProvider: 'google',
+          googleSub: payload.sub,
+          isEmailVerified: !!payload.email_verified,
+          updatedAt: now,
+        })
+        .where(eq(users.id, matchedByGoogle[0].id))
+        .returning();
+      userRecord = updated[0];
+    } else {
+      const inserted = await db
+        .insert(users)
+        .values({
+          name,
+          email,
+          avatar,
+          authProvider: 'google',
+          googleSub: payload.sub,
+          isEmailVerified: !!payload.email_verified,
+          points: 0,
+        })
+        .returning();
+      userRecord = inserted[0];
+    }
+
+    return c.json(toPublicUser(userRecord));
+  } catch (error: any) {
+    return c.json({ error: error.message }, 401);
   }
 });
 
@@ -39,6 +240,42 @@ app.get('/projects', async (c) => {
   try {
     const allProjects = await db.select().from(projects);
     return c.json(allProjects);
+  } catch (error: any) {
+    return c.json({ error: error.message }, 500);
+  }
+});
+
+app.post('/projects', async (c) => {
+  try {
+    const body = await c.req.json();
+    const title = String(body?.title ?? '').trim();
+    const description = String(body?.description ?? '').trim();
+    const goal = Number(body?.goal ?? 0);
+    const creatorId = Number(body?.creatorId ?? 0);
+
+    if (!title || !description || !Number.isFinite(goal) || goal <= 0 || !Number.isInteger(creatorId) || creatorId <= 0) {
+      return c.json({ error: 'title, description, goal and creatorId are required' }, 400);
+    }
+
+    const inserted = await db
+      .insert(projects)
+      .values({
+        title,
+        slug: `${slugify(title)}-${Date.now()}`,
+        description,
+        category: String(body?.category ?? 'general'),
+        status: String(body?.status ?? 'draft'),
+        goal,
+        raised: Number(body?.raised ?? 0),
+        coverImage: body?.coverImage ? String(body.coverImage) : null,
+        location: body?.location ? String(body.location) : null,
+        beneficiaryName: body?.beneficiaryName ? String(body.beneficiaryName) : null,
+        isFeatured: !!body?.isFeatured,
+        creatorId,
+      })
+      .returning();
+
+    return c.json(inserted[0], 201);
   } catch (error: any) {
     return c.json({ error: error.message }, 500);
   }

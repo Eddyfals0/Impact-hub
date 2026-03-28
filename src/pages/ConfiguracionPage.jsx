@@ -134,10 +134,10 @@ export default function ConfiguracionPage() {
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-xs font-bold text-text-muted uppercase tracking-wider mb-2">LinkedIn</label>
+                                        <label className="block text-xs font-bold text-text-muted uppercase tracking-wider mb-2">Perfil público (URL)</label>
                                         <input
                                             type="url"
-                                            defaultValue="https://linkedin.com/in/eduardo"
+                                            placeholder="https://tu-perfil.com"
                                             className="w-full h-12 px-4 bg-background-light dark:bg-background-dark border border-border-light dark:border-border-dark rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none text-text-main dark:text-text-light text-sm transition-all"
                                         />
                                     </div>

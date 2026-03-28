@@ -41,7 +41,7 @@ const FAQ_CATEGORIES = [
         icon: 'manage_accounts',
         questions: [
             { q: '¿Cómo cambio mi contraseña?', a: 'Ve a Configuración > Seguridad > Cambiar Contraseña. Necesitarás ingresar tu contraseña actual y definir una nueva. Recomendamos usar al menos 8 caracteres con letras, números y símbolos.' },
-            { q: '¿Puedo vincular mi cuenta de LinkedIn?', a: 'Sí. Desde tu perfil de usuario o desde Configuración > Perfil, encontrarás la opción para sincronizar tu cuenta de LinkedIn. Esto nos permite verificar tu identidad y mostrarte proyectos relevantes.' },
+            { q: '¿Puedo iniciar sesión con Google?', a: 'Sí. Puedes iniciar sesión con Google desde la pantalla de acceso. También puedes crear tu cuenta usando correo electrónico y contraseña.' },
             { q: '¿Cómo elimino mi cuenta?', a: 'Puedes solicitar la eliminación de tu cuenta desde Configuración > Seguridad > Zona de Peligro. Ten en cuenta que esta acción es irreversible y perderás todos tus puntos, insignias e historial de donaciones.' },
         ]
     },

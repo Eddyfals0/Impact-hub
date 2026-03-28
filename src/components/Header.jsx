@@ -126,7 +126,7 @@ export default function Header() {
                                             />
                                             <div className="flex-1 min-w-0">
                                                 <p className="text-sm font-bold text-text-main dark:text-text-light truncate">{user.name}</p>
-                                                <p className="text-[10px] text-text-muted truncate">eduardo@impacthub.com</p>
+                                                <p className="text-[10px] text-text-muted truncate">{user.email}</p>
                                             </div>
                                         </div>
                                         <div className="mt-3 flex items-center gap-2 bg-primary/10 px-3 py-1.5 rounded-lg">

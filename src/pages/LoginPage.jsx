@@ -12,7 +12,7 @@ export default function LoginPage() {
     const [localError, setLocalError] = useState('')
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [googleReady, setGoogleReady] = useState(false)
-    const [googleClientId, setGoogleClientId] = useState(import.meta.env.VITE_GOOGLE_CLIENT_ID || '')
+    const [googleClientId, setGoogleClientId] = useState('')
 
     useEffect(() => {
         if (window.google?.accounts?.id) {
@@ -94,7 +94,7 @@ export default function LoginPage() {
         setLocalError('')
 
         if (!googleClientId) {
-            setLocalError('Falta configurar GOOGLE_CLIENT_ID o VITE_GOOGLE_CLIENT_ID')
+            setLocalError('Falta configurar GOOGLE_CLIENT_ID en el servidor')
             return
         }
 

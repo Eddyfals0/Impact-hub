@@ -12,8 +12,7 @@ export default function LoginPage() {
     const [localError, setLocalError] = useState('')
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [googleReady, setGoogleReady] = useState(false)
-
-    const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID
+    const [googleClientId, setGoogleClientId] = useState(import.meta.env.VITE_GOOGLE_CLIENT_ID || '')
 
     useEffect(() => {
         if (window.google?.accounts?.id) {
@@ -28,6 +27,26 @@ export default function LoginPage() {
         script.onload = () => setGoogleReady(true)
         document.body.appendChild(script)
     }, [])
+
+    useEffect(() => {
+        if (googleClientId) return
+
+        const fetchGoogleClientId = async () => {
+            try {
+                const response = await fetch('/api/auth/google/client-id')
+                if (!response.ok) return
+
+                const data = await response.json()
+                if (data?.clientId) {
+                    setGoogleClientId(data.clientId)
+                }
+            } catch {
+                // No-op: we show a clear message when login is attempted.
+            }
+        }
+
+        fetchGoogleClientId()
+    }, [googleClientId])
 
     const handleInput = (key) => (e) => {
         setForm((prev) => ({ ...prev, [key]: e.target.value }))
@@ -74,8 +93,8 @@ export default function LoginPage() {
     const handleGoogleLogin = async () => {
         setLocalError('')
 
-        if (!GOOGLE_CLIENT_ID) {
-            setLocalError('Falta configurar VITE_GOOGLE_CLIENT_ID en .env')
+        if (!googleClientId) {
+            setLocalError('Falta configurar GOOGLE_CLIENT_ID o VITE_GOOGLE_CLIENT_ID')
             return
         }
 
@@ -85,7 +104,7 @@ export default function LoginPage() {
         }
 
         window.google.accounts.id.initialize({
-            client_id: GOOGLE_CLIENT_ID,
+            client_id: googleClientId,
             callback: async (response) => {
                 try {
                     setIsSubmitting(true)

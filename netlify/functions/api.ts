@@ -51,6 +51,16 @@ app.get('/hello', (c) => {
   return c.json({ message: 'Hello from Netlify Functions + Hono!' });
 });
 
+// Public auth config for frontend bootstrap
+app.get('/auth/google/client-id', (c) => {
+  const clientId = process.env.GOOGLE_CLIENT_ID || process.env.VITE_GOOGLE_CLIENT_ID;
+  if (!clientId) {
+    return c.json({ error: 'Google client id is not configured' }, 404);
+  }
+
+  return c.json({ clientId });
+});
+
 // Current user
 app.get('/auth/me', async (c) => {
   try {

@@ -10,6 +10,11 @@ export default defineConfig({
     tailwindcss(),
   ],
   server: {
+    fs: {
+      // Windows + OneDrive can resolve canonical paths outside the workspace root.
+      // Disabling strict mode avoids false "file does not exist" for /src/main.jsx.
+      strict: false,
+    },
     proxy: {
       '/api': {
         target: 'http://localhost:8888', // Default Netlify dev port

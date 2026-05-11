@@ -31,6 +31,8 @@ const toPublicUser = (user: typeof users.$inferSelect) => ({
   updatedAt: user.updatedAt,
 });
 
+
+
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback_secret_do_not_use_in_prod';
 
 const slugify = (value: string) =>

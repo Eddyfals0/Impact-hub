@@ -36,3 +36,14 @@ export const projects = pgTable('projects', {
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
 });
+
+export const donations = pgTable('donations', {
+  id: serial('id').primaryKey(),
+  projectId: integer('project_id').references(() => projects.id).notNull(),
+  userId: integer('user_id').references(() => users.id),
+  amount: integer('amount').notNull(),
+  donorName: text('donor_name').notNull(),
+  donorEmail: text('donor_email').notNull(),
+  isAnonymous: boolean('is_anonymous').notNull().default(false),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+});

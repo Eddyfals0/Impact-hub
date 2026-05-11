@@ -89,3 +89,21 @@ CREATE TRIGGER projects_set_updated_at
 --   (SELECT id FROM users WHERE email = 'admin@impacthub.dev')
 -- )
 -- ON CONFLICT (slug) DO NOTHING;
+
+-- =============================================================
+-- Tabla: donations
+-- =============================================================
+CREATE TABLE IF NOT EXISTS donations (
+  id                SERIAL PRIMARY KEY,
+  project_id        INTEGER     NOT NULL REFERENCES projects (id) ON DELETE CASCADE,
+  user_id           INTEGER     REFERENCES users (id) ON DELETE SET NULL,
+  amount            INTEGER     NOT NULL,
+  donor_name        TEXT        NOT NULL,
+  donor_email       TEXT        NOT NULL,
+  is_anonymous      BOOLEAN     NOT NULL DEFAULT FALSE,
+  created_at        TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS donations_project_idx ON donations (project_id);
+CREATE INDEX IF NOT EXISTS donations_user_idx    ON donations (user_id);
+

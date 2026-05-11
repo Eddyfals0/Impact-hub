@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import DonationModal from '../components/DonationModal'
 
 /* ─── Datos de Ejemplo ─── */
 // Lista de los 3 proyectos más exitosos que se mostrarán destacados en la parte superior.
@@ -32,7 +33,7 @@ const STATS = [
 /* ─── Componentes Internos ─── */
 // Este es el diseño de la "tarjeta" individual para cada proyecto.
 // Recibe un proyecto específico y dibuja su imagen, título, progreso y botón de donar.
-function ProjectCard({ project }) {
+function ProjectCard({ project, onDonate }) {
     return (
         <div className="flex flex-col bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark rounded-2xl overflow-hidden shadow-sm group hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
             <div className="relative h-48 overflow-hidden">
@@ -73,7 +74,7 @@ function ProjectCard({ project }) {
                     </div>
 
                     <div className="flex gap-2 pt-1">
-                        <button className="flex-1 py-2.5 bg-primary hover:bg-green-400 text-background-dark font-black rounded-xl transition-all shadow-sm active:scale-95 text-xs">
+                        <button onClick={() => onDonate(project)} className="flex-1 py-2.5 bg-primary hover:bg-green-400 text-background-dark font-black rounded-xl transition-all shadow-sm active:scale-95 text-xs">
                             DONAR AHORA
                         </button>
                         <button className="px-3 py-2.5 bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark text-text-muted hover:text-primary hover:border-primary rounded-xl transition-all flex items-center justify-center">
@@ -93,6 +94,7 @@ export default function ProyectosPage() {
     // Variables para guardar lo que el usuario está buscando y la categoría que seleccionó.
     const [activeFilter, setActiveFilter] = useState('Todos')
     const [search, setSearch] = useState('')
+    const [donateProject, setDonateProject] = useState(null)
 
     // Filtramos la lista principal de proyectos basándonos en si coinciden con
     // el filtro de categoría o con el texto que el usuario escribió.
@@ -212,7 +214,7 @@ export default function ProyectosPage() {
                                         </div>
                                     </div>
 
-                                    <button className="w-full py-2.5 bg-primary hover:bg-green-400 text-background-dark font-black rounded-xl text-xs transition-all active:scale-95 shadow-sm">
+                                    <button onClick={() => setDonateProject({id: p.id, title: p.title})} className="w-full py-2.5 bg-primary hover:bg-green-400 text-background-dark font-black rounded-xl text-xs transition-all active:scale-95 shadow-sm">
                                         DONAR A ESTE PROYECTO
                                     </button>
                                 </div>
@@ -273,7 +275,7 @@ export default function ProyectosPage() {
                 {filteredProjects.length > 0 ? (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                         {filteredProjects.map((p) => (
-                            <ProjectCard key={p.id} project={p} />
+                            <ProjectCard key={p.id} project={p} onDonate={setDonateProject} />
                         ))}
                     </div>
                 ) : (
@@ -307,6 +309,9 @@ export default function ProyectosPage() {
                     </div>
                 </div>
             </section>
+            {donateProject && (
+                <DonationModal project={donateProject} onClose={() => setDonateProject(null)} onSuccess={() => setDonateProject(null)} />
+            )}
         </div>
     )
 }

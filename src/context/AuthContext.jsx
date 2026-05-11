@@ -1,5 +1,5 @@
 /* eslint-disable react-refresh/only-export-components */
-import { createContext, useContext, useState, useEffect } from 'react'
+import { createContext, useContext, useState, useEffect, useCallback } from 'react'
 
 const AuthContext = createContext()
 const SESSION_TOKEN_KEY = 'impacthub_auth_token'
@@ -25,7 +25,7 @@ export function AuthProvider({ children }) {
         setUser(null)
     }
 
-    const apiFetch = async (path, init = {}) => {
+    const apiFetch = useCallback(async (path, init = {}) => {
         const token = localStorage.getItem(SESSION_TOKEN_KEY)
         const headers = new Headers(init.headers || {})
         if (token) {
@@ -49,7 +49,7 @@ export function AuthProvider({ children }) {
         } finally {
             window.clearTimeout(timeout)
         }
-    }
+    }, [])
 
     const readApiPayload = async (response) => {
         const contentType = response.headers.get('content-type') || ''
@@ -89,6 +89,24 @@ export function AuthProvider({ children }) {
         return data.user
     }
 
+    // Re-obtener datos del usuario desde el servidor (después de comprar puntos, donar, etc.)
+    const refreshUser = useCallback(async () => {
+        const token = localStorage.getItem(SESSION_TOKEN_KEY)
+        if (!token) return null
+
+        try {
+            const response = await apiFetch('/api/auth/me')
+            if (response.ok) {
+                const data = await response.json()
+                setUser(data)
+                return data
+            }
+        } catch (error) {
+            console.error('Error refreshing user:', error)
+        }
+        return null
+    }, [apiFetch])
+
     useEffect(() => {
         const fetchUser = async () => {
             const token = localStorage.getItem(SESSION_TOKEN_KEY)
@@ -114,7 +132,7 @@ export function AuthProvider({ children }) {
         }
 
         fetchUser()
-    }, [])
+    }, [apiFetch])
 
     const loginWithEmail = async ({ email, password }) => {
         setAuthError('')
@@ -151,6 +169,8 @@ export function AuthProvider({ children }) {
                 registerWithEmail,
                 loginWithGoogle,
                 logout,
+                refreshUser,
+                apiFetch,
             }}
         >
             {children}

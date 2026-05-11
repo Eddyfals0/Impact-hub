@@ -1,15 +1,12 @@
+import { useState } from 'react'
 import { Link, Navigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import UserAvatar from '../components/UserAvatar'
 
-const ROLE_LABELS = {
-    donor: 'Donante',
-    admin: 'Administrador',
-}
+const ROLE_LABELS = { donor: 'Donante', admin: 'Administrador' }
 
 const getMemberYear = (createdAt) => {
     if (!createdAt) return new Date().getFullYear()
-
     const date = new Date(createdAt)
     return Number.isNaN(date.getTime()) ? new Date().getFullYear() : date.getFullYear()
 }
@@ -19,7 +16,6 @@ const getImpactProfile = (user) => {
     const level = Math.max(1, Math.floor(points / 1000) + 1)
     const xpNext = level * 1000
     const rewardTotal = 5800
-
     return {
         name: user?.name || user?.email?.split('@')[0] || 'Usuario Impact Hub',
         email: user?.email || '',
@@ -35,12 +31,7 @@ const getImpactProfile = (user) => {
         xp: points,
         xpNext,
         topPercent: points >= 5000 ? '5%' : points >= 1000 ? '25%' : '100%',
-        rewardGoal: {
-            name: 'Guardián del Agua',
-            current: points,
-            total: rewardTotal,
-            pct: Math.min(100, Math.round((points / rewardTotal) * 100)),
-        },
+        rewardGoal: { name: 'Guardián del Agua', current: points, total: rewardTotal, pct: Math.min(100, Math.round((points / rewardTotal) * 100)) },
     }
 }
 
@@ -51,21 +42,46 @@ const BADGES = [
     { icon: 'workspace_premium', color: 'text-gray-400', name: 'Visionario', desc: 'Bloqueado', active: false },
 ]
 
-const CONTRIBUTIONS = []
+const POINT_PACKAGES = [
+    { id: 'starter', points: 100, price: '$1', icon: 'bolt', gradient: 'from-blue-500 to-cyan-400' },
+    { id: 'popular', points: 500, price: '$5', icon: 'local_fire_department', gradient: 'from-orange-500 to-yellow-400', badge: 'Popular' },
+    { id: 'premium', points: 1000, price: '$10', icon: 'diamond', gradient: 'from-purple-500 to-pink-400' },
+    { id: 'mega', points: 5000, price: '$50', icon: 'rocket_launch', gradient: 'from-emerald-500 to-primary', badge: 'Mejor Valor' },
+]
 
 // Panel personal del usuario (Perfil).
 // Muestra su historial de donaciones, insignias obtenidas y su nivel actual de impacto.
 export default function UserPage() {
-    const { user, isLoading } = useAuth()
+    const { user, isLoading, apiFetch, refreshUser } = useAuth()
+    const [buying, setBuying] = useState(null)
+    const [buySuccess, setBuySuccess] = useState(null)
+    const [buyError, setBuyError] = useState('')
 
-    if (isLoading) {
-        return (
-            <div className="flex-grow flex items-center justify-center p-10 text-text-muted">
-                Cargando perfil...
-            </div>
-        )
+    const handleBuyPoints = async (pkgId) => {
+        setBuying(pkgId)
+        setBuyError('')
+        setBuySuccess(null)
+        try {
+            const res = await apiFetch('/api/points/buy', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ packageId: pkgId }),
+            })
+            const data = await res.json()
+            if (!res.ok) throw new Error(data.error || 'Error al comprar')
+            await refreshUser()
+            setBuySuccess(data.purchased)
+            setTimeout(() => setBuySuccess(null), 3000)
+        } catch (e) {
+            setBuyError(e.message)
+        } finally {
+            setBuying(null)
+        }
     }
 
+    if (isLoading) {
+        return (<div className="flex-grow flex items-center justify-center p-10 text-text-muted">Cargando perfil...</div>)
+    }
     if (!user) {
         return <Navigate to="/login" replace />
     }
@@ -78,12 +94,8 @@ export default function UserPage() {
             {/* Header */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
                 <div>
-                    <h1 className="text-text-main dark:text-text-light text-3xl md:text-4xl font-black leading-tight tracking-[-0.033em]">
-                        Mi Panel de Impacto
-                    </h1>
-                    <p className="text-text-muted dark:text-gray-400 text-base font-normal mt-1">
-                        Sigue tus contribuciones al ODS 1 de la ONU: Fin de la Pobreza
-                    </p>
+                    <h1 className="text-text-main dark:text-text-light text-3xl md:text-4xl font-black leading-tight tracking-[-0.033em]">Mi Panel de Impacto</h1>
+                    <p className="text-text-muted dark:text-gray-400 text-base font-normal mt-1">Sigue tus contribuciones al ODS 1 de la ONU: Fin de la Pobreza</p>
                 </div>
                 <div className="flex items-center gap-2 bg-surface-light dark:bg-surface-dark px-4 py-2 rounded-full border border-border-light dark:border-border-dark shadow-sm">
                     <span className="material-symbols-outlined text-yellow-500">emoji_events</span>
@@ -191,19 +203,64 @@ export default function UserPage() {
                                 <div className="text-sm font-medium text-text-muted dark:text-gray-400 mb-2">{s.label}</div>
                                 <div className="text-3xl font-black text-text-main dark:text-text-light tracking-tight">{s.value}</div>
                                 <div className="mt-4 flex items-center gap-2">
-                                    {s.badge && (
-                                        s.isLink ? (
-                                            <Link to="/tienda" className={`text-xs font-bold ${s.badgeBg} px-2 py-1 rounded flex items-center gap-1 hover:opacity-80 transition-opacity`}>
-                                                {s.badge}
-                                            </Link>
-                                        ) : (
-                                            <span className={`text-xs font-bold ${s.badgeBg} px-2 py-1 rounded`}>{s.badge}</span>
-                                        )
-                                    )}
+                                    {s.badge && (s.isLink ? (
+                                        <Link to="/tienda" className={`text-xs font-bold ${s.badgeBg} px-2 py-1 rounded flex items-center gap-1 hover:opacity-80 transition-opacity`}>{s.badge}</Link>
+                                    ) : (
+                                        <span className={`text-xs font-bold ${s.badgeBg} px-2 py-1 rounded`}>{s.badge}</span>
+                                    ))}
                                     {s.badgeExtra && <span className="text-xs text-text-muted">{s.badgeExtra}</span>}
                                 </div>
                             </div>
                         ))}
+                    </div>
+
+                    {/* ═══ BUY POINTS SECTION ═══ */}
+                    <div className="bg-surface-light dark:bg-surface-dark p-6 lg:p-8 rounded-xl shadow-sm border border-border-light dark:border-border-dark">
+                        <div className="flex items-center gap-3 mb-6">
+                            <div className="size-10 rounded-xl bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center text-white shadow-lg">
+                                <span className="material-symbols-outlined text-xl">shopping_cart</span>
+                            </div>
+                            <div>
+                                <h3 className="text-xl font-bold text-text-main dark:text-text-light">Comprar Puntos</h3>
+                                <p className="text-xs text-text-muted">Adquiere puntos para donar a proyectos de impacto</p>
+                            </div>
+                        </div>
+
+                        {buySuccess && (
+                            <div className="mb-4 flex items-center gap-2 bg-primary/10 text-primary px-4 py-3 rounded-xl text-sm font-bold animate-pulse">
+                                <span className="material-symbols-outlined">check_circle</span>
+                                ¡Compraste {buySuccess.points.toLocaleString()} puntos por {buySuccess.price}!
+                            </div>
+                        )}
+                        {buyError && (
+                            <div className="mb-4 flex items-center gap-2 bg-red-500/10 text-red-500 px-4 py-3 rounded-xl text-sm font-bold">
+                                <span className="material-symbols-outlined">error</span>
+                                {buyError}
+                            </div>
+                        )}
+
+                        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                            {POINT_PACKAGES.map((pkg) => (
+                                <button
+                                    key={pkg.id}
+                                    onClick={() => handleBuyPoints(pkg.id)}
+                                    disabled={buying === pkg.id}
+                                    className="relative flex flex-col items-center text-center p-5 rounded-2xl border-2 border-border-light dark:border-border-dark hover:border-primary bg-background-light dark:bg-background-dark transition-all hover:-translate-y-1 hover:shadow-lg group active:scale-95 disabled:opacity-60"
+                                >
+                                    {pkg.badge && (
+                                        <span className="absolute -top-2.5 right-2 px-2 py-0.5 bg-primary text-background-dark text-[9px] font-black uppercase rounded-full shadow">{pkg.badge}</span>
+                                    )}
+                                    <div className={`size-12 rounded-xl bg-gradient-to-br ${pkg.gradient} flex items-center justify-center text-white mb-3 shadow-md group-hover:scale-110 transition-transform`}>
+                                        <span className="material-symbols-outlined text-2xl">{pkg.icon}</span>
+                                    </div>
+                                    <div className="text-2xl font-black text-text-main dark:text-text-light mb-0.5">
+                                        {buying === pkg.id ? '...' : pkg.points.toLocaleString()}
+                                    </div>
+                                    <div className="text-[10px] text-text-muted font-bold uppercase tracking-wider mb-2">Puntos</div>
+                                    <div className="text-sm font-black text-primary">{pkg.price}</div>
+                                </button>
+                            ))}
+                        </div>
                     </div>
 
                     {/* XP Level */}
@@ -241,15 +298,7 @@ export default function UserPage() {
                             </div>
                             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                                 {BADGES.map((b) => (
-                                    <div
-                                        key={b.name}
-                                        className={`group flex flex-col items-center text-center p-4 rounded-xl transition-all cursor-pointer border ${b.active
-                                            ? b.special
-                                                ? 'bg-indigo-50 dark:bg-indigo-900/10 hover:bg-indigo-100 dark:hover:bg-indigo-900/20 border-transparent hover:border-indigo-500/30'
-                                                : 'bg-gray-50 dark:bg-white/5 hover:bg-primary/5 border-transparent hover:border-primary/30'
-                                            : 'bg-gray-50 dark:bg-white/5 border-transparent opacity-50 grayscale'
-                                            }`}
-                                    >
+                                    <div key={b.name} className={`group flex flex-col items-center text-center p-4 rounded-xl transition-all cursor-pointer border ${b.active ? b.special ? 'bg-indigo-50 dark:bg-indigo-900/10 hover:bg-indigo-100 dark:hover:bg-indigo-900/20 border-transparent hover:border-indigo-500/30' : 'bg-gray-50 dark:bg-white/5 hover:bg-primary/5 border-transparent hover:border-primary/30' : 'bg-gray-50 dark:bg-white/5 border-transparent opacity-50 grayscale'}`}>
                                         <div className={`bg-white dark:bg-white/10 shadow-sm ${b.color} rounded-full p-3 mb-3 ${b.active ? 'group-hover:scale-110' : ''} transition-transform`}>
                                             <span className="material-symbols-outlined">{b.icon}</span>
                                         </div>
@@ -265,10 +314,6 @@ export default function UserPage() {
                     <div className="bg-surface-light dark:bg-surface-dark rounded-xl shadow-sm border border-border-light dark:border-border-dark overflow-hidden">
                         <div className="p-6 border-b border-border-light dark:border-border-dark flex justify-between items-center">
                             <h3 className="text-lg font-bold text-text-main dark:text-text-light">Historial de Contribuciones</h3>
-                            <button className="text-sm text-primary font-bold hover:underline flex items-center gap-1">
-                                Ver Todo
-                                <span className="material-symbols-outlined text-sm">arrow_forward</span>
-                            </button>
                         </div>
                         <div className="overflow-x-auto">
                             <table className="w-full text-left text-sm">
@@ -276,35 +321,15 @@ export default function UserPage() {
                                     <tr>
                                         <th className="px-6 py-4">Proyecto</th>
                                         <th className="px-6 py-4">Fecha</th>
-                                        <th className="px-6 py-4">Meta de Impacto</th>
                                         <th className="px-6 py-4 text-right">Monto</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-border-light dark:divide-border-dark">
-                                    {CONTRIBUTIONS.length ? (
-                                        CONTRIBUTIONS.map((c) => (
-                                            <tr key={c.id} className="group hover:bg-primary/5 transition-colors">
-                                                <td className="px-6 py-4">
-                                                    <div className="font-bold text-text-main dark:text-text-light">{c.project}</div>
-                                                    <div className="text-xs text-text-muted">ID: {c.id}</div>
-                                                </td>
-                                                <td className="px-6 py-4 text-text-muted">{c.date}</td>
-                                                <td className="px-6 py-4">
-                                                    <span className={`inline-flex items-center gap-1.5 ${c.tagColor} px-2.5 py-1 rounded-md text-xs font-bold border`}>
-                                                        <span className="material-symbols-outlined text-xs">{c.tagIcon}</span>
-                                                        {c.tag}
-                                                    </span>
-                                                </td>
-                                                <td className="px-6 py-4 text-right font-bold text-text-main dark:text-text-light">{c.amount}</td>
-                                            </tr>
-                                        ))
-                                    ) : (
-                                        <tr>
-                                            <td className="px-6 py-10 text-center text-text-muted" colSpan="4">
-                                                Aún no hay contribuciones registradas para esta cuenta.
-                                            </td>
-                                        </tr>
-                                    )}
+                                    <tr>
+                                        <td className="px-6 py-10 text-center text-text-muted" colSpan="3">
+                                            Aún no hay contribuciones registradas para esta cuenta.
+                                        </td>
+                                    </tr>
                                 </tbody>
                             </table>
                         </div>

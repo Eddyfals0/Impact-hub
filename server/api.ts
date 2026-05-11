@@ -1,7 +1,7 @@
 import { Hono } from 'hono';
 import { db } from './db/index.js';
-import { users, projects } from './db/schema.js';
-import { eq } from 'drizzle-orm';
+import { users, projects, donations } from './db/schema.js';
+import { eq, sql } from 'drizzle-orm';
 import { compare, hash } from 'bcryptjs';
 import { OAuth2Client } from 'google-auth-library';
 import { sign, verify } from 'hono/jwt';
@@ -42,6 +42,29 @@ const slugify = (value: string) =>
     .replace(/[^a-z0-9\s-]/g, '')
     .replace(/\s+/g, '-')
     .replace(/-+/g, '-');
+
+// ── Helper: extraer usuario autenticado del JWT ──
+const getAuthUser = async (c: any) => {
+  const authHeader = c.req.header('Authorization');
+  if (!authHeader || !authHeader.startsWith('Bearer ')) return null;
+  const token = authHeader.split(' ')[1];
+  try {
+    const payload = await verify(token, JWT_SECRET, 'HS256');
+    const userId = Number(payload.id);
+    const matched = await db.select().from(users).where(eq(users.id, userId)).limit(1);
+    return matched.length ? matched[0] : null;
+  } catch {
+    return null;
+  }
+};
+
+// ── Paquetes de puntos mock ──
+const POINT_PACKAGES: Record<string, { points: number; price: string }> = {
+  starter:  { points: 100,  price: '$1' },
+  popular:  { points: 500,  price: '$5' },
+  premium:  { points: 1000, price: '$10' },
+  mega:     { points: 5000, price: '$50' },
+};
 
 app.get('/hello', (c) => {
   return c.json({ message: 'Hello from Vercel + Hono!' });
@@ -248,10 +271,30 @@ app.post('/auth/google', async (c) => {
   }
 });
 
+// ═══════════════════════════════════════════════════════════
+//  PROJECTS
+// ═══════════════════════════════════════════════════════════
+
 app.get('/projects', async (c) => {
   try {
     const allProjects = await db.select().from(projects);
     return c.json(allProjects);
+  } catch (error: any) {
+    return c.json({ error: error.message }, 500);
+  }
+});
+
+app.get('/projects/:id', async (c) => {
+  try {
+    const id = Number(c.req.param('id'));
+    if (!Number.isInteger(id) || id <= 0) {
+      return c.json({ error: 'Invalid project id' }, 400);
+    }
+    const matched = await db.select().from(projects).where(eq(projects.id, id)).limit(1);
+    if (!matched.length) {
+      return c.json({ error: 'Project not found' }, 404);
+    }
+    return c.json(matched[0]);
   } catch (error: any) {
     return c.json({ error: error.message }, 500);
   }
@@ -292,3 +335,172 @@ app.post('/projects', async (c) => {
     return c.json({ error: error.message }, 500);
   }
 });
+
+// ═══════════════════════════════════════════════════════════
+//  POINTS — Compra de puntos (mock)
+// ═══════════════════════════════════════════════════════════
+
+app.get('/points/packages', (c) => {
+  return c.json(POINT_PACKAGES);
+});
+
+app.post('/points/buy', async (c) => {
+  try {
+    const authUser = await getAuthUser(c);
+    if (!authUser) {
+      return c.json({ error: 'Debes iniciar sesión para comprar puntos' }, 401);
+    }
+
+    const body = await c.req.json();
+    const packageId = String(body?.packageId ?? '').trim();
+    const pkg = POINT_PACKAGES[packageId];
+    if (!pkg) {
+      return c.json({ error: 'Paquete inválido. Opciones: starter, popular, premium, mega' }, 400);
+    }
+
+    const updated = await db
+      .update(users)
+      .set({
+        points: sql`COALESCE(${users.points}, 0) + ${pkg.points}`,
+        updatedAt: new Date(),
+      })
+      .where(eq(users.id, authUser.id))
+      .returning();
+
+    return c.json({ user: toPublicUser(updated[0]), purchased: pkg });
+  } catch (error: any) {
+    return c.json({ error: error.message }, 500);
+  }
+});
+
+// ═══════════════════════════════════════════════════════════
+//  DONATIONS
+// ═══════════════════════════════════════════════════════════
+
+app.post('/donations/authenticated', async (c) => {
+  try {
+    const authUser = await getAuthUser(c);
+    if (!authUser) {
+      return c.json({ error: 'Debes iniciar sesión para donar con puntos' }, 401);
+    }
+
+    const body = await c.req.json();
+    const projectId = Number(body?.projectId ?? 0);
+    const amount = Number(body?.amount ?? 0);
+
+    if (!Number.isInteger(projectId) || projectId <= 0) {
+      return c.json({ error: 'projectId inválido' }, 400);
+    }
+    if (!Number.isInteger(amount) || amount <= 0) {
+      return c.json({ error: 'El monto debe ser un entero positivo' }, 400);
+    }
+
+    const currentPoints = authUser.points ?? 0;
+    if (currentPoints < amount) {
+      return c.json({ error: `No tienes suficientes puntos. Tienes ${currentPoints}, necesitas ${amount}` }, 400);
+    }
+
+    // Verificar que el proyecto existe
+    const projectMatch = await db.select().from(projects).where(eq(projects.id, projectId)).limit(1);
+    if (!projectMatch.length) {
+      return c.json({ error: 'Proyecto no encontrado' }, 404);
+    }
+
+    // Restar puntos del usuario
+    const updatedUser = await db
+      .update(users)
+      .set({
+        points: sql`COALESCE(${users.points}, 0) - ${amount}`,
+        updatedAt: new Date(),
+      })
+      .where(eq(users.id, authUser.id))
+      .returning();
+
+    // Sumar raised al proyecto
+    const updatedProject = await db
+      .update(projects)
+      .set({
+        raised: sql`COALESCE(${projects.raised}, 0) + ${amount}`,
+        updatedAt: new Date(),
+      })
+      .where(eq(projects.id, projectId))
+      .returning();
+
+    // Registrar donación
+    await db.insert(donations).values({
+      projectId,
+      userId: authUser.id,
+      amount,
+      donorName: authUser.name,
+      donorEmail: authUser.email,
+      isAnonymous: false,
+    });
+
+    return c.json({
+      user: toPublicUser(updatedUser[0]),
+      project: updatedProject[0],
+      message: `¡Donaste ${amount} puntos a "${updatedProject[0].title}"!`,
+    });
+  } catch (error: any) {
+    return c.json({ error: error.message }, 500);
+  }
+});
+
+app.post('/donations/anonymous', async (c) => {
+  try {
+    const body = await c.req.json();
+    const projectId = Number(body?.projectId ?? 0);
+    const amount = Number(body?.amount ?? 0);
+    const donorName = String(body?.donorName ?? '').trim();
+    const donorEmail = String(body?.donorEmail ?? '').trim();
+
+    if (!Number.isInteger(projectId) || projectId <= 0) {
+      return c.json({ error: 'projectId inválido' }, 400);
+    }
+    if (!Number.isInteger(amount) || amount <= 0) {
+      return c.json({ error: 'El monto debe ser un entero positivo' }, 400);
+    }
+    if (!donorName) {
+      return c.json({ error: 'Se requiere el nombre del donante' }, 400);
+    }
+    if (!donorEmail) {
+      return c.json({ error: 'Se requiere el email del donante' }, 400);
+    }
+
+    // Verificar que el proyecto existe
+    const projectMatch = await db.select().from(projects).where(eq(projects.id, projectId)).limit(1);
+    if (!projectMatch.length) {
+      return c.json({ error: 'Proyecto no encontrado' }, 404);
+    }
+
+    // Sumar raised al proyecto
+    const updatedProject = await db
+      .update(projects)
+      .set({
+        raised: sql`COALESCE(${projects.raised}, 0) + ${amount}`,
+        updatedAt: new Date(),
+      })
+      .where(eq(projects.id, projectId))
+      .returning();
+
+    // Registrar donación anónima
+    await db.insert(donations).values({
+      projectId,
+      userId: null,
+      amount,
+      donorName,
+      donorEmail,
+      isAnonymous: true,
+    });
+
+    return c.json({
+      project: updatedProject[0],
+      message: `¡Gracias ${donorName}! Donaste ${amount} puntos a "${updatedProject[0].title}"`,
+    });
+  } catch (error: any) {
+    return c.json({ error: error.message }, 500);
+  }
+});
+
+
+

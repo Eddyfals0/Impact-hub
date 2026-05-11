@@ -67,6 +67,11 @@ export default function UserPage() {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ packageId: pkgId }),
             })
+            const ct = res.headers.get('content-type') || ''
+            if (!ct.includes('application/json')) {
+                const txt = await res.text()
+                throw new Error(txt.slice(0, 120) || `Error del servidor (${res.status})`)
+            }
             const data = await res.json()
             if (!res.ok) throw new Error(data.error || 'Error al comprar')
             await refreshUser()

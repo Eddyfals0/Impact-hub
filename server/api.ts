@@ -1,7 +1,7 @@
 import { Hono } from 'hono';
 import { db } from './db/index.js';
 import { users, projects, donations } from './db/schema.js';
-import { eq, sql } from 'drizzle-orm';
+import { eq } from 'drizzle-orm';
 import { compare, hash } from 'bcryptjs';
 import { OAuth2Client } from 'google-auth-library';
 import { sign, verify } from 'hono/jwt';
@@ -358,10 +358,11 @@ app.post('/points/buy', async (c) => {
       return c.json({ error: 'Paquete inválido. Opciones: starter, popular, premium, mega' }, 400);
     }
 
+    const newPoints = (authUser.points ?? 0) + pkg.points;
     const updated = await db
       .update(users)
       .set({
-        points: sql`COALESCE(${users.points}, 0) + ${pkg.points}`,
+        points: newPoints,
         updatedAt: new Date(),
       })
       .where(eq(users.id, authUser.id))
@@ -407,20 +408,22 @@ app.post('/donations/authenticated', async (c) => {
     }
 
     // Restar puntos del usuario
+    const newUserPoints = (authUser.points ?? 0) - amount;
     const updatedUser = await db
       .update(users)
       .set({
-        points: sql`COALESCE(${users.points}, 0) - ${amount}`,
+        points: newUserPoints,
         updatedAt: new Date(),
       })
       .where(eq(users.id, authUser.id))
       .returning();
 
     // Sumar raised al proyecto
+    const newRaised = (projectMatch[0].raised ?? 0) + amount;
     const updatedProject = await db
       .update(projects)
       .set({
-        raised: sql`COALESCE(${projects.raised}, 0) + ${amount}`,
+        raised: newRaised,
         updatedAt: new Date(),
       })
       .where(eq(projects.id, projectId))
@@ -474,10 +477,11 @@ app.post('/donations/anonymous', async (c) => {
     }
 
     // Sumar raised al proyecto
+    const newRaisedAnon = (projectMatch[0].raised ?? 0) + amount;
     const updatedProject = await db
       .update(projects)
       .set({
-        raised: sql`COALESCE(${projects.raised}, 0) + ${amount}`,
+        raised: newRaisedAnon,
         updatedAt: new Date(),
       })
       .where(eq(projects.id, projectId))
@@ -502,5 +506,54 @@ app.post('/donations/anonymous', async (c) => {
   }
 });
 
+// ═══════════════════════════════════════════════════════════
+//  DELETE — Operaciones de eliminación
+// ═══════════════════════════════════════════════════════════
 
+app.delete('/projects/:id', async (c) => {
+  try {
+    const authUser = await getAuthUser(c);
+    if (!authUser) {
+      return c.json({ error: 'Debes iniciar sesión' }, 401);
+    }
+    const id = Number(c.req.param('id'));
+    if (!Number.isInteger(id) || id <= 0) {
+      return c.json({ error: 'ID inválido' }, 400);
+    }
+    const matched = await db.select().from(projects).where(eq(projects.id, id)).limit(1);
+    if (!matched.length) {
+      return c.json({ error: 'Proyecto no encontrado' }, 404);
+    }
+    if (matched[0].creatorId !== authUser.id && authUser.role !== 'admin') {
+      return c.json({ error: 'No tienes permiso para eliminar este proyecto' }, 403);
+    }
+    await db.delete(projects).where(eq(projects.id, id));
+    return c.json({ message: 'Proyecto eliminado exitosamente', deletedId: id });
+  } catch (error: any) {
+    return c.json({ error: error.message }, 500);
+  }
+});
 
+app.delete('/donations/:id', async (c) => {
+  try {
+    const authUser = await getAuthUser(c);
+    if (!authUser) {
+      return c.json({ error: 'Debes iniciar sesión' }, 401);
+    }
+    const id = Number(c.req.param('id'));
+    if (!Number.isInteger(id) || id <= 0) {
+      return c.json({ error: 'ID inválido' }, 400);
+    }
+    const matched = await db.select().from(donations).where(eq(donations.id, id)).limit(1);
+    if (!matched.length) {
+      return c.json({ error: 'Donación no encontrada' }, 404);
+    }
+    if (matched[0].userId !== authUser.id && authUser.role !== 'admin') {
+      return c.json({ error: 'No tienes permiso para eliminar esta donación' }, 403);
+    }
+    await db.delete(donations).where(eq(donations.id, id));
+    return c.json({ message: 'Donación eliminada exitosamente', deletedId: id });
+  } catch (error: any) {
+    return c.json({ error: error.message }, 500);
+  }
+});

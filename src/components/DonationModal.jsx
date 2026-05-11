@@ -34,6 +34,11 @@ export default function DonationModal({ project, onClose, onSuccess }) {
                     body: JSON.stringify({ projectId: project.id, amount, donorName: name.trim(), donorEmail: email.trim() }),
                 })
             }
+            const ct = res.headers.get('content-type') || ''
+            if (!ct.includes('application/json')) {
+                const txt = await res.text()
+                throw new Error(txt.slice(0, 120) || `Error del servidor (${res.status})`)
+            }
             const data = await res.json()
             if (!res.ok) throw new Error(data.error || 'Error al donar')
             if (isLoggedIn) await refreshUser()

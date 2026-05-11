@@ -63,7 +63,7 @@ app.get('/auth/me', async (c) => {
     const token = authHeader.split(' ')[1];
     let payload;
     try {
-      payload = await verify(token, JWT_SECRET);
+      payload = await verify(token, JWT_SECRET, 'HS256');
     } catch (e) {
       return c.json({ error: 'Invalid token' }, 401);
     }
@@ -135,7 +135,7 @@ app.post('/auth/register', async (c) => {
       userRecord = inserted[0];
     }
 
-    const token = await sign({ id: userRecord.id }, JWT_SECRET);
+    const token = await sign({ id: userRecord.id }, JWT_SECRET, 'HS256');
     return c.json({ user: toPublicUser(userRecord), token }, 201);
   } catch (error: any) {
     return c.json({ error: error.message }, 500);
@@ -168,7 +168,7 @@ app.post('/auth/login', async (c) => {
       .where(eq(users.id, matched[0].id))
       .returning();
 
-    const token = await sign({ id: refreshed[0].id }, JWT_SECRET);
+    const token = await sign({ id: refreshed[0].id }, JWT_SECRET, 'HS256');
     return c.json({ user: toPublicUser(refreshed[0]), token });
   } catch (error: any) {
     return c.json({ error: error.message }, 500);
@@ -239,7 +239,7 @@ app.post('/auth/google', async (c) => {
       userRecord = inserted[0];
     }
 
-    const token = await sign({ id: userRecord.id }, JWT_SECRET);
+    const token = await sign({ id: userRecord.id }, JWT_SECRET, 'HS256');
     return c.json({ user: toPublicUser(userRecord), token });
   } catch (error: any) {
     return c.json({ error: error.message }, 401);

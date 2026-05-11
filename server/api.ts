@@ -1,6 +1,6 @@
 import { Hono } from 'hono';
-import { db } from './db';
-import { users, projects } from './db/schema';
+import { db } from './db/index.js';
+import { users, projects } from './db/schema.js';
 import { eq } from 'drizzle-orm';
 import { compare, hash } from 'bcryptjs';
 import { OAuth2Client } from 'google-auth-library';

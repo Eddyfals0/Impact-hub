@@ -1,10 +1,3 @@
-import { handle } from '@hono/node-server/vercel';
-import { app } from '../../../server/api.js';
+import { googleClientIdHandler } from '../../../server/vercel-api.js';
 
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-};
-
-export default handle(app);
+export default googleClientIdHandler;

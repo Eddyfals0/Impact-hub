@@ -17,28 +17,36 @@ Impact Hub ha evolucionado las donaciones benéficas para el nuevo milenio. No s
 
 ## 🚀 Cómo instalar y ejecutar el proyecto localmente
 
-El proyecto está construido con las siguientes tecnologías clave:
-*   [React](https://react.dev/) (v19)
-*   [Vite](https://vitejs.dev/) (Empaquetador ultrarrápido)
-*   [TailwindCSS](https://tailwindcss.com/) (Estilos utilitarios)
-*   [React Router](https://reactrouter.com/) (Navegación entre páginas)
+Arquitectura: **monolito monorepo cliente-servidor** desplegable en Vercel.
 
-### Pasos para iniciar:
+*   Cliente: [React](https://react.dev/) 19 + [Vite](https://vitejs.dev/) + [TailwindCSS](https://tailwindcss.com/) + [React Router](https://reactrouter.com/) (carpeta `src/`).
+*   Servidor: [Hono](https://hono.dev/) corriendo como Serverless Function en Vercel (carpeta `server/` + entrypoint en `api/[[...route]].ts`).
+*   Base de datos: [Neon](https://neon.tech/) Postgres accedida con [Drizzle ORM](https://orm.drizzle.team/).
+*   Auth: email/contraseña con `bcryptjs` + Google Sign-In con `google-auth-library`.
 
-1.  **Clona el repositorio** (Si lo descargaste desde GitHub):
+### Pasos para iniciar localmente
+
+1.  **Clona e instala:**
     ```bash
-    git clone https://github.com/TU-USUARIO/impact-hub.git
-    cd impact-hub
-    ```
-2.  **Instala las dependencias:**
-    ```bash
+    git clone https://github.com/Eddyfals0/Impact-hub.git
+    cd Impact-hub
     npm install
     ```
-3.  **Inicia el servidor de desarrollo:**
+2.  **Configura variables de entorno** copiando `.env.example` a `.env` y llenando:
+    *   `DATABASE_URL` → cadena de conexión de Neon (la que termina en `?sslmode=require`).
+    *   `GOOGLE_CLIENT_ID` y `VITE_GOOGLE_CLIENT_ID` → mismo Client ID de Google OAuth.
+3.  **Crea el esquema en Neon** (solo la primera vez): abre el SQL Editor de Neon y pega el contenido de [server/db/schema.sql](server/db/schema.sql). Es idempotente.
+4.  **Levanta cliente + API** (dos procesos en paralelo):
     ```bash
-    npm run dev
+    npm run dev:full
     ```
-4.  Abre tu navegador y entra a `http://localhost:5173/` (o la ruta que te indique la terminal) para ver la aplicación corriendo.
+    La web queda en `http://localhost:5173` y la API en `http://localhost:8787` (Vite hace proxy de `/api` → API).
+
+### Despliegue en Vercel
+
+1.  Conecta el repo en el dashboard de Vercel (framework auto-detectado: Vite).
+2.  En **Project Settings → Environment Variables** agrega: `DATABASE_URL`, `GOOGLE_CLIENT_ID`, `VITE_GOOGLE_CLIENT_ID`.
+3.  Vercel compila el cliente (`vite build` → `dist/`) y publica la función de `api/[[...route]].ts`. No se requiere nada extra, `vercel.json` ya está configurado.
 
 ---
 

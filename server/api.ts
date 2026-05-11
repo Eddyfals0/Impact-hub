@@ -1,10 +1,10 @@
 import { Hono } from 'hono';
-import { handle } from 'hono/netlify';
-import { db } from '../../src/db';
-import { users, projects } from '../../src/db/schema';
+import { db } from './db';
+import { users, projects } from './db/schema';
 import { eq } from 'drizzle-orm';
 import { compare, hash } from 'bcryptjs';
 import { OAuth2Client } from 'google-auth-library';
+import { sign, verify } from 'hono/jwt';
 
 export const app = new Hono().basePath('/api');
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
@@ -31,12 +31,7 @@ const toPublicUser = (user: typeof users.$inferSelect) => ({
   updatedAt: user.updatedAt,
 });
 
-const parseUserIdHeader = (rawUserId: string | undefined): number | null => {
-  if (!rawUserId) return null;
-  const parsed = Number(rawUserId);
-  if (!Number.isInteger(parsed) || parsed <= 0) return null;
-  return parsed;
-};
+const JWT_SECRET = process.env.JWT_SECRET || 'fallback_secret_do_not_use_in_prod';
 
 const slugify = (value: string) =>
   value
@@ -46,28 +41,34 @@ const slugify = (value: string) =>
     .replace(/\s+/g, '-')
     .replace(/-+/g, '-');
 
-// Test route
 app.get('/hello', (c) => {
-  return c.json({ message: 'Hello from Netlify Functions + Hono!' });
+  return c.json({ message: 'Hello from Vercel + Hono!' });
 });
 
-// Public auth config for frontend bootstrap
 app.get('/auth/google/client-id', (c) => {
   const clientId = process.env.GOOGLE_CLIENT_ID || process.env.VITE_GOOGLE_CLIENT_ID;
   if (!clientId) {
     return c.json({ error: 'Google client id is not configured' }, 404);
   }
-
   return c.json({ clientId });
 });
 
-// Current user
 app.get('/auth/me', async (c) => {
   try {
-    const userId = parseUserIdHeader(c.req.header('x-user-id'));
-    if (!userId) {
+    const authHeader = c.req.header('Authorization');
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return c.json({ error: 'Unauthenticated' }, 401);
     }
+    
+    const token = authHeader.split(' ')[1];
+    let payload;
+    try {
+      payload = await verify(token, JWT_SECRET);
+    } catch (e) {
+      return c.json({ error: 'Invalid token' }, 401);
+    }
+
+    const userId = Number(payload.id);
 
     const matched = await db.select().from(users).where(eq(users.id, userId)).limit(1);
     if (!matched.length) {
@@ -81,7 +82,6 @@ app.get('/auth/me', async (c) => {
   }
 });
 
-// Register with email + password
 app.post('/auth/register', async (c) => {
   try {
     const body = await c.req.json();
@@ -135,13 +135,13 @@ app.post('/auth/register', async (c) => {
       userRecord = inserted[0];
     }
 
-    return c.json(toPublicUser(userRecord), 201);
+    const token = await sign({ id: userRecord.id }, JWT_SECRET);
+    return c.json({ user: toPublicUser(userRecord), token }, 201);
   } catch (error: any) {
     return c.json({ error: error.message }, 500);
   }
 });
 
-// Login with email + password
 app.post('/auth/login', async (c) => {
   try {
     const body = await c.req.json();
@@ -168,13 +168,13 @@ app.post('/auth/login', async (c) => {
       .where(eq(users.id, matched[0].id))
       .returning();
 
-    return c.json(toPublicUser(refreshed[0]));
+    const token = await sign({ id: refreshed[0].id }, JWT_SECRET);
+    return c.json({ user: toPublicUser(refreshed[0]), token });
   } catch (error: any) {
     return c.json({ error: error.message }, 500);
   }
 });
 
-// Login/Register with Google id_token
 app.post('/auth/google', async (c) => {
   try {
     const body = await c.req.json();
@@ -239,13 +239,13 @@ app.post('/auth/google', async (c) => {
       userRecord = inserted[0];
     }
 
-    return c.json(toPublicUser(userRecord));
+    const token = await sign({ id: userRecord.id }, JWT_SECRET);
+    return c.json({ user: toPublicUser(userRecord), token });
   } catch (error: any) {
     return c.json({ error: error.message }, 401);
   }
 });
 
-// Projects route
 app.get('/projects', async (c) => {
   try {
     const allProjects = await db.select().from(projects);
@@ -290,5 +290,3 @@ app.post('/projects', async (c) => {
     return c.json({ error: error.message }, 500);
   }
 });
-
-export const handler = handle(app);

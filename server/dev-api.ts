@@ -1,8 +1,8 @@
-import { serve } from '@hono/node-server';
 import 'dotenv/config';
-import { app } from '../netlify/functions/api';
+import { serve } from '@hono/node-server';
+import { app } from './api';
 
-const port = Number(process.env.API_PORT || 8888);
+const port = Number(process.env.API_PORT || 8787);
 
 serve(
   {

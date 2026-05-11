@@ -2,7 +2,7 @@
 import { createContext, useContext, useState, useEffect } from 'react'
 
 const AuthContext = createContext()
-const SESSION_USER_ID_KEY = 'impacthub_user_id'
+const SESSION_TOKEN_KEY = 'impacthub_auth_token'
 
 // Atajo para usar la información de inicio de sesión en cualquier parte.
 export const useAuth = () => useContext(AuthContext)
@@ -12,23 +12,23 @@ export function AuthProvider({ children }) {
     const [isLoading, setIsLoading] = useState(true)
     const [authError, setAuthError] = useState('')
 
-    const persistSession = (nextUser) => {
-        setUser(nextUser)
-        if (nextUser?.id) {
-            localStorage.setItem(SESSION_USER_ID_KEY, String(nextUser.id))
+    const persistSession = (userRecord, token) => {
+        setUser(userRecord)
+        if (token) {
+            localStorage.setItem(SESSION_TOKEN_KEY, token)
         }
     }
 
     const clearSession = () => {
-        localStorage.removeItem(SESSION_USER_ID_KEY)
+        localStorage.removeItem(SESSION_TOKEN_KEY)
         setUser(null)
     }
 
     const apiFetch = async (path, init = {}) => {
-        const storedId = localStorage.getItem(SESSION_USER_ID_KEY)
+        const token = localStorage.getItem(SESSION_TOKEN_KEY)
         const headers = new Headers(init.headers || {})
-        if (storedId) {
-            headers.set('x-user-id', storedId)
+        if (token) {
+            headers.set('Authorization', `Bearer ${token}`)
         }
 
         return fetch(path, {
@@ -51,8 +51,8 @@ export function AuthProvider({ children }) {
 
     useEffect(() => {
         const fetchUser = async () => {
-            const storedId = localStorage.getItem(SESSION_USER_ID_KEY)
-            if (!storedId) {
+            const token = localStorage.getItem(SESSION_TOKEN_KEY)
+            if (!token) {
                 setIsLoading(false)
                 return
             }
@@ -61,7 +61,7 @@ export function AuthProvider({ children }) {
                 const response = await apiFetch('/api/auth/me')
                 if (response.ok) {
                     const data = await response.json()
-                    setUser(data)
+                    setUser(data) // /auth/me solo devuelve el user
                 } else {
                     clearSession()
                 }
@@ -91,8 +91,8 @@ export function AuthProvider({ children }) {
             throw new Error(message)
         }
 
-        persistSession(data)
-        return data
+        persistSession(data.user, data.token)
+        return data.user
     }
 
     const registerWithEmail = async ({ name, email, password }) => {
@@ -110,8 +110,8 @@ export function AuthProvider({ children }) {
             throw new Error(message)
         }
 
-        persistSession(data)
-        return data
+        persistSession(data.user, data.token)
+        return data.user
     }
 
     const loginWithGoogle = async (idToken) => {
@@ -129,8 +129,8 @@ export function AuthProvider({ children }) {
             throw new Error(message)
         }
 
-        persistSession(data)
-        return data
+        persistSession(data.user, data.token)
+        return data.user
     }
 
     // Compatibilidad con llamadas anteriores.

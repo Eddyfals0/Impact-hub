@@ -1,12 +1,12 @@
 {
-  "name": "impact-hub-react",
+  "name": "impact-hub",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.1.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "dev:api": "tsx server/dev-api.ts",
-    "dev:full": "pwsh -NoProfile -ExecutionPolicy Bypass -Command \"$api = Start-Process npm -ArgumentList 'run dev:api' -PassThru; npm run dev; Stop-Process -Id $api.Id -Force\"",
+    "dev:full": "concurrently -k -n api,web -c cyan,magenta \"npm:dev:api\" \"npm:dev\"",
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview"
@@ -27,9 +27,11 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",
+    "@types/node": "^22.10.1",
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.1",
+    "concurrently": "^9.1.0",
     "eslint": "^9.39.1",
     "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-react-refresh": "^0.4.24",

@@ -126,7 +126,7 @@ app.post('/auth/register', async (c) => {
       return c.json({ error: 'Email already registered' }, 409);
     }
 
-    const passwordHash = await hash(password, 10);
+    const passwordHash = await hash(password, 6);
     const now = new Date();
 
     let userRecord: typeof users.$inferSelect;

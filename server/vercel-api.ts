@@ -145,7 +145,7 @@ export async function registerHandler(req: any, res: any) {
       return;
     }
 
-    const passwordHash = await hash(password, 10);
+    const passwordHash = await hash(password, 6);
     const now = new Date();
     let userRecord: typeof users.$inferSelect;
 

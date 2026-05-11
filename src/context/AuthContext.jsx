@@ -3,7 +3,7 @@ import { createContext, useContext, useState, useEffect, useCallback } from 'rea
 
 const AuthContext = createContext()
 const SESSION_TOKEN_KEY = 'impacthub_auth_token'
-const API_TIMEOUT_MS = 15000
+const API_TIMEOUT_MS = 45000
 
 // Atajo para usar la información de inicio de sesión en cualquier parte.
 export const useAuth = () => useContext(AuthContext)

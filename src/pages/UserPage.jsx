@@ -1,21 +1,47 @@
-import { Link } from 'react-router-dom'
+import { Link, Navigate } from 'react-router-dom'
+import { useAuth } from '../context/AuthContext'
+import UserAvatar from '../components/UserAvatar'
 
-const USER = {
-    name: 'Eduardo',
-    role: 'Estudiante de Ingeniería',
-    avatar: 'https://i.pravatar.cc/300?u=eduardo',
-    memberSince: '2024',
-    projects: 15,
-    totalContributed: '$2,180',
-    contributedChange: '+22%',
-    impactPoints: 5_800,
-    livesImpacted: 47,
-    level: 6,
-    levelTitle: 'Constructor de Comunidad',
-    xp: 1_680,
-    xpNext: 2_500,
-    topPercent: '5%',
-    rewardGoal: { name: 'Guardián del Agua', current: 4200, total: 5800, pct: 72 },
+const ROLE_LABELS = {
+    donor: 'Donante',
+    admin: 'Administrador',
+}
+
+const getMemberYear = (createdAt) => {
+    if (!createdAt) return new Date().getFullYear()
+
+    const date = new Date(createdAt)
+    return Number.isNaN(date.getTime()) ? new Date().getFullYear() : date.getFullYear()
+}
+
+const getImpactProfile = (user) => {
+    const points = user?.points ?? 0
+    const level = Math.max(1, Math.floor(points / 1000) + 1)
+    const xpNext = level * 1000
+    const rewardTotal = 5800
+
+    return {
+        name: user?.name || user?.email?.split('@')[0] || 'Usuario Impact Hub',
+        email: user?.email || '',
+        role: user?.bio || ROLE_LABELS[user?.role] || 'Donante',
+        memberSince: getMemberYear(user?.createdAt),
+        projects: 0,
+        totalContributed: '$0',
+        contributedChange: '0%',
+        impactPoints: points,
+        livesImpacted: 0,
+        level,
+        levelTitle: points >= 5000 ? 'Constructor de Comunidad' : points >= 1000 ? 'Colaborador Activo' : 'Nuevo Donante',
+        xp: points,
+        xpNext,
+        topPercent: points >= 5000 ? '5%' : points >= 1000 ? '25%' : '100%',
+        rewardGoal: {
+            name: 'Guardián del Agua',
+            current: points,
+            total: rewardTotal,
+            pct: Math.min(100, Math.round((points / rewardTotal) * 100)),
+        },
+    }
 }
 
 const BADGES = [
@@ -25,18 +51,27 @@ const BADGES = [
     { icon: 'workspace_premium', color: 'text-gray-400', name: 'Visionario', desc: 'Bloqueado', active: false },
 ]
 
-const CONTRIBUTIONS = [
-    { id: '#83921', project: 'Agua Limpia para Kenia', date: '24 Oct 2024', tag: 'Agua Limpia', tagIcon: 'water_drop', tagColor: 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 border-blue-100 dark:border-blue-900/30', amount: '$250.00' },
-    { id: '#92011', project: 'Iniciativa de Útiles Escolares', date: '12 Oct 2024', tag: 'Educación', tagIcon: 'school', tagColor: 'bg-yellow-50 dark:bg-yellow-900/20 text-yellow-700 dark:text-yellow-300 border-yellow-100 dark:border-yellow-900/30', amount: '$100.00' },
-    { id: '#77421', project: 'Microcréditos para Mujeres', date: '28 Sep 2024', tag: 'Empleo', tagIcon: 'work', tagColor: 'bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300 border-green-100 dark:border-green-900/30', amount: '$500.00' },
-    { id: '#61204', project: 'Paneles Solares Rurales', date: '15 Sep 2024', tag: 'Energía', tagIcon: 'bolt', tagColor: 'bg-orange-50 dark:bg-orange-900/20 text-orange-700 dark:text-orange-300 border-orange-100 dark:border-orange-900/30', amount: '$330.00' },
-    { id: '#55102', project: 'Viviendas Resilientes', date: '01 Sep 2024', tag: 'Infraestructura', tagIcon: 'home', tagColor: 'bg-purple-50 dark:bg-purple-900/20 text-purple-700 dark:text-purple-300 border-purple-100 dark:border-purple-900/30', amount: '$1,000.00' },
-]
+const CONTRIBUTIONS = []
 
 // Panel personal del usuario (Perfil).
 // Muestra su historial de donaciones, insignias obtenidas y su nivel actual de impacto.
 export default function UserPage() {
-    const xpPct = Math.round((USER.xp / USER.xpNext) * 100)
+    const { user, isLoading } = useAuth()
+
+    if (isLoading) {
+        return (
+            <div className="flex-grow flex items-center justify-center p-10 text-text-muted">
+                Cargando perfil...
+            </div>
+        )
+    }
+
+    if (!user) {
+        return <Navigate to="/login" replace />
+    }
+
+    const profile = getImpactProfile(user)
+    const xpPct = Math.min(100, Math.round((profile.xp / profile.xpNext) * 100))
 
     return (
         <div className="flex-grow w-full px-4 md:px-10 py-8 max-w-[1280px] mx-auto">
@@ -52,7 +87,7 @@ export default function UserPage() {
                 </div>
                 <div className="flex items-center gap-2 bg-surface-light dark:bg-surface-dark px-4 py-2 rounded-full border border-border-light dark:border-border-dark shadow-sm">
                     <span className="material-symbols-outlined text-yellow-500">emoji_events</span>
-                    <span className="text-sm font-bold text-text-main dark:text-text-light">Donante Top {USER.topPercent}</span>
+                    <span className="text-sm font-bold text-text-main dark:text-text-light">Donante Top {profile.topPercent}</span>
                 </div>
             </div>
 
@@ -63,27 +98,25 @@ export default function UserPage() {
                     <div className="bg-surface-light dark:bg-surface-dark p-6 rounded-xl shadow-sm border border-border-light dark:border-border-dark flex flex-col items-center text-center relative overflow-hidden">
                         <div className="absolute top-0 left-0 w-full h-24 bg-gradient-to-b from-primary/10 to-transparent" />
                         <div className="relative mb-4 mt-2">
-                            <div
-                                className="w-28 h-28 rounded-full bg-gray-200 bg-cover bg-center border-4 border-white dark:border-background-dark shadow-lg"
-                                style={{ backgroundImage: `url('${USER.avatar}')` }}
-                            />
-                            <div className="absolute bottom-0 right-0 bg-primary text-background-dark p-1.5 rounded-full border-2 border-white dark:border-background-dark flex items-center justify-center shadow-sm" title={`Nivel verificado ${USER.level}`}>
+                            <UserAvatar user={user} size="xl" className="border-4 border-white dark:border-background-dark" />
+                            <div className="absolute bottom-0 right-0 bg-primary text-background-dark p-1.5 rounded-full border-2 border-white dark:border-background-dark flex items-center justify-center shadow-sm" title={`Nivel verificado ${profile.level}`}>
                                 <span className="material-symbols-outlined text-[16px] font-bold">verified</span>
                             </div>
                         </div>
-                        <h2 className="text-xl font-bold mb-1 text-text-main dark:text-text-light">{USER.name}</h2>
-                        <p className="text-text-muted dark:text-gray-400 text-sm mb-4 font-medium">{USER.role}</p>
-                        <a className="flex items-center gap-2 text-[#0077b5] bg-[#0077b5]/10 px-4 py-2 rounded-full text-xs font-bold mb-6 hover:bg-[#0077b5]/20 transition-colors" href="#">
-                            <span className="material-symbols-outlined text-sm">link</span>
-                            Sincronizado con LinkedIn
-                        </a>
+                        <h2 className="text-xl font-bold mb-1 text-text-main dark:text-text-light">{profile.name}</h2>
+                        <p className="text-text-muted dark:text-gray-400 text-sm font-medium">{profile.role}</p>
+                        <p className="text-text-muted dark:text-gray-500 text-xs mb-4">{profile.email}</p>
+                        <div className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs font-bold mb-6 ${user.isEmailVerified ? 'text-primary bg-primary/10' : 'text-yellow-500 bg-yellow-500/10'}`}>
+                            <span className="material-symbols-outlined text-sm">{user.isEmailVerified ? 'verified' : 'mail'}</span>
+                            {user.isEmailVerified ? 'Correo verificado' : 'Correo pendiente de verificar'}
+                        </div>
                         <div className="grid grid-cols-2 gap-4 w-full border-t border-border-light dark:border-border-dark pt-6">
                             <div className="text-center">
-                                <div className="text-2xl font-bold text-text-main dark:text-text-light">{USER.memberSince}</div>
+                                <div className="text-2xl font-bold text-text-main dark:text-text-light">{profile.memberSince}</div>
                                 <div className="text-xs text-text-muted uppercase tracking-wide font-bold">Miembro Desde</div>
                             </div>
                             <div className="text-center">
-                                <div className="text-2xl font-bold text-text-main dark:text-text-light">{USER.projects}</div>
+                                <div className="text-2xl font-bold text-text-main dark:text-text-light">{profile.projects}</div>
                                 <div className="text-xs text-text-muted uppercase tracking-wide font-bold">Proyectos</div>
                             </div>
                         </div>
@@ -107,15 +140,15 @@ export default function UserPage() {
                                     </div>
                                     <div>
                                         <div className="text-[10px] font-bold opacity-70 uppercase">Meta: Skin Exclusiva</div>
-                                        <div className="text-sm font-bold">{USER.rewardGoal.name}</div>
+                                        <div className="text-sm font-bold">{profile.rewardGoal.name}</div>
                                     </div>
                                 </div>
                                 <div className="w-full bg-black/30 rounded-full h-1.5 mb-1">
-                                    <div className="bg-gradient-to-r from-yellow-400 to-yellow-200 h-1.5 rounded-full" style={{ width: `${USER.rewardGoal.pct}%` }} />
+                                    <div className="bg-gradient-to-r from-yellow-400 to-yellow-200 h-1.5 rounded-full" style={{ width: `${profile.rewardGoal.pct}%` }} />
                                 </div>
                                 <div className="flex justify-between text-[10px] font-medium opacity-80">
-                                    <span>{USER.rewardGoal.current.toLocaleString()} / {USER.rewardGoal.total.toLocaleString()} Puntos</span>
-                                    <span>{USER.rewardGoal.pct}%</span>
+                                    <span>{profile.rewardGoal.current.toLocaleString()} / {profile.rewardGoal.total.toLocaleString()} Puntos</span>
+                                    <span>{profile.rewardGoal.pct}%</span>
                                 </div>
                             </div>
                             <Link to="/tienda" className="w-full py-2.5 bg-white text-indigo-900 font-bold rounded-lg text-sm hover:bg-indigo-50 transition-colors shadow-sm flex items-center justify-center gap-2">
@@ -147,9 +180,9 @@ export default function UserPage() {
                     {/* Stats */}
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         {[
-                            { label: 'Total Contribuido', value: USER.totalContributed, icon: 'savings', iconBg: 'bg-primary/10', iconColor: 'text-green-700 dark:text-primary', badge: USER.contributedChange, badgeBg: 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400', badgeExtra: 'vs mes anterior', hoverBorder: 'hover:border-primary/50' },
-                            { label: 'Puntos de Impacto', value: USER.impactPoints.toLocaleString(), icon: 'stars', iconBg: 'bg-yellow-100 dark:bg-yellow-900/20', iconColor: 'text-yellow-700 dark:text-yellow-400', badge: 'Canjear →', badgeBg: 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400', isLink: true, hoverBorder: 'hover:border-yellow-500/50' },
-                            { label: 'Vidas Impactadas', value: USER.livesImpacted, icon: 'diversity_1', iconBg: 'bg-primary/10', iconColor: 'text-green-700 dark:text-primary', badgeExtra: 'Familias apoyadas', hoverBorder: 'hover:border-primary/50' },
+                            { label: 'Total Contribuido', value: profile.totalContributed, icon: 'savings', iconBg: 'bg-primary/10', iconColor: 'text-green-700 dark:text-primary', badge: profile.contributedChange, badgeBg: 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400', badgeExtra: 'vs mes anterior', hoverBorder: 'hover:border-primary/50' },
+                            { label: 'Puntos de Impacto', value: profile.impactPoints.toLocaleString(), icon: 'stars', iconBg: 'bg-yellow-100 dark:bg-yellow-900/20', iconColor: 'text-yellow-700 dark:text-yellow-400', badge: 'Canjear →', badgeBg: 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400', isLink: true, hoverBorder: 'hover:border-yellow-500/50' },
+                            { label: 'Vidas Impactadas', value: profile.livesImpacted, icon: 'diversity_1', iconBg: 'bg-primary/10', iconColor: 'text-green-700 dark:text-primary', badgeExtra: 'Familias apoyadas', hoverBorder: 'hover:border-primary/50' },
                         ].map((s) => (
                             <div key={s.label} className={`bg-surface-light dark:bg-surface-dark p-6 rounded-xl shadow-sm border border-border-light dark:border-border-dark relative overflow-hidden group ${s.hoverBorder} transition-colors`}>
                                 <div className={`absolute top-4 right-4 p-2 ${s.iconBg} rounded-lg ${s.iconColor}`}>
@@ -178,13 +211,13 @@ export default function UserPage() {
                         <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
                             <div>
                                 <div className="flex items-center gap-2 mb-1">
-                                    <h3 className="text-xl font-bold text-text-main dark:text-text-light">Nivel de Impacto {USER.level}</h3>
-                                    <span className="bg-primary text-background-dark text-[10px] px-2 py-0.5 rounded font-bold uppercase">{USER.levelTitle}</span>
+                                    <h3 className="text-xl font-bold text-text-main dark:text-text-light">Nivel de Impacto {profile.level}</h3>
+                                    <span className="bg-primary text-background-dark text-[10px] px-2 py-0.5 rounded font-bold uppercase">{profile.levelTitle}</span>
                                 </div>
-                                <p className="text-sm text-text-muted dark:text-gray-400">¡Estás en el {USER.topPercent} superior de donantes este mes!</p>
+                                <p className="text-sm text-text-muted dark:text-gray-400">Tu progreso se calcula con los puntos reales de tu cuenta.</p>
                             </div>
                             <div className="text-right hidden md:block">
-                                <div className="text-2xl font-bold text-text-main dark:text-text-light">{USER.xp.toLocaleString()} XP</div>
+                                <div className="text-2xl font-bold text-text-main dark:text-text-light">{profile.xp.toLocaleString()} XP</div>
                                 <div className="text-xs text-text-muted">Experiencia Total</div>
                             </div>
                         </div>
@@ -194,8 +227,8 @@ export default function UserPage() {
                             </div>
                         </div>
                         <div className="flex justify-between text-xs font-bold text-text-muted mb-8">
-                            <span>Actual: {USER.xp.toLocaleString()} XP</span>
-                            <span>Siguiente Nivel: {USER.xpNext.toLocaleString()} XP</span>
+                            <span>Actual: {profile.xp.toLocaleString()} XP</span>
+                            <span>Siguiente Nivel: {profile.xpNext.toLocaleString()} XP</span>
                         </div>
 
                         <div className="border-t border-border-light dark:border-border-dark my-6" />
@@ -248,22 +281,30 @@ export default function UserPage() {
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-border-light dark:divide-border-dark">
-                                    {CONTRIBUTIONS.map((c) => (
-                                        <tr key={c.id} className="group hover:bg-primary/5 transition-colors">
-                                            <td className="px-6 py-4">
-                                                <div className="font-bold text-text-main dark:text-text-light">{c.project}</div>
-                                                <div className="text-xs text-text-muted">ID: {c.id}</div>
+                                    {CONTRIBUTIONS.length ? (
+                                        CONTRIBUTIONS.map((c) => (
+                                            <tr key={c.id} className="group hover:bg-primary/5 transition-colors">
+                                                <td className="px-6 py-4">
+                                                    <div className="font-bold text-text-main dark:text-text-light">{c.project}</div>
+                                                    <div className="text-xs text-text-muted">ID: {c.id}</div>
+                                                </td>
+                                                <td className="px-6 py-4 text-text-muted">{c.date}</td>
+                                                <td className="px-6 py-4">
+                                                    <span className={`inline-flex items-center gap-1.5 ${c.tagColor} px-2.5 py-1 rounded-md text-xs font-bold border`}>
+                                                        <span className="material-symbols-outlined text-xs">{c.tagIcon}</span>
+                                                        {c.tag}
+                                                    </span>
+                                                </td>
+                                                <td className="px-6 py-4 text-right font-bold text-text-main dark:text-text-light">{c.amount}</td>
+                                            </tr>
+                                        ))
+                                    ) : (
+                                        <tr>
+                                            <td className="px-6 py-10 text-center text-text-muted" colSpan="4">
+                                                Aún no hay contribuciones registradas para esta cuenta.
                                             </td>
-                                            <td className="px-6 py-4 text-text-muted">{c.date}</td>
-                                            <td className="px-6 py-4">
-                                                <span className={`inline-flex items-center gap-1.5 ${c.tagColor} px-2.5 py-1 rounded-md text-xs font-bold border`}>
-                                                    <span className="material-symbols-outlined text-xs">{c.tagIcon}</span>
-                                                    {c.tag}
-                                                </span>
-                                            </td>
-                                            <td className="px-6 py-4 text-right font-bold text-text-main dark:text-text-light">{c.amount}</td>
                                         </tr>
-                                    ))}
+                                    )}
                                 </tbody>
                             </table>
                         </div>

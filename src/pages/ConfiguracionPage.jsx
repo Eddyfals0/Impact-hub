@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useAuth } from '../context/AuthContext'
+import UserAvatar from '../components/UserAvatar'
 
 const SAVED_CARDS = [
     { id: 1, brand: 'Visa', last4: '4521', exp: '09/27', icon: 'credit_card', color: 'from-blue-600 to-blue-800' },
@@ -13,9 +14,9 @@ export default function ConfiguracionPage() {
 
     const [form, setForm] = useState({
         name: user?.name || '',
-        email: 'eduardo@impacthub.com',
-        phone: '+52 33 1234 5678',
-        bio: 'Estudiante de Ingeniería apasionado por el impacto social.',
+        email: user?.email || '',
+        phone: '',
+        bio: user?.bio || '',
     })
     const [passwordForm, setPasswordForm] = useState({ current: '', newPass: '', confirm: '' })
     const [saved, setSaved] = useState(false)
@@ -80,24 +81,15 @@ export default function ConfiguracionPage() {
                         <>
                             {/* Avatar section */}
                             <div className="bg-surface-light dark:bg-surface-dark rounded-2xl border border-border-light dark:border-border-dark p-6 shadow-sm">
-                                <h2 className="text-lg font-bold text-text-main dark:text-text-light mb-4">Foto de Perfil</h2>
+                                <h2 className="text-lg font-bold text-text-main dark:text-text-light mb-4">Perfil</h2>
                                 <div className="flex items-center gap-6">
                                     <div className="relative">
-                                        <div
-                                            className="size-20 rounded-full bg-cover bg-center border-4 border-primary/20 shadow-lg"
-                                            style={{ backgroundImage: `url('${user?.avatar}')` }}
-                                        />
-                                        <button className="absolute -bottom-1 -right-1 size-8 bg-primary text-background-dark rounded-full flex items-center justify-center shadow-md hover:bg-green-400 transition-colors">
-                                            <span className="material-symbols-outlined text-sm">edit</span>
-                                        </button>
+                                        <UserAvatar user={user} size="xl" className="!size-20 !text-xl" />
                                     </div>
                                     <div>
-                                        <p className="text-sm text-text-main dark:text-text-light font-medium">Sube una nueva foto</p>
-                                        <p className="text-xs text-text-muted mt-1">JPG, PNG o GIF. Máximo 5MB.</p>
-                                        <div className="flex gap-2 mt-3">
-                                            <button className="px-4 py-2 bg-primary/10 text-primary font-bold text-xs rounded-lg hover:bg-primary/20 transition-colors">Subir foto</button>
-                                            <button className="px-4 py-2 text-red-500 font-bold text-xs rounded-lg hover:bg-red-50 dark:hover:bg-red-900/10 transition-colors">Eliminar</button>
-                                        </div>
+                                        <p className="text-sm text-text-main dark:text-text-light font-medium">{user?.name || 'Usuario Impact Hub'}</p>
+                                        <p className="text-xs text-text-muted mt-1">{user?.email}</p>
+                                        <p className="text-xs text-text-muted mt-3">La cuenta usa iniciales para evitar fotos falsas o genéricas.</p>
                                     </div>
                                 </div>
                             </div>
@@ -318,7 +310,7 @@ export default function ConfiguracionPage() {
                                                     type="text"
                                                     value={newCard.name}
                                                     onChange={(e) => setNewCard({ ...newCard, name: e.target.value })}
-                                                    placeholder="Eduardo García"
+                                                    placeholder={user?.name || 'Nombre completo'}
                                                     className="w-full h-12 px-4 bg-background-light dark:bg-background-dark border border-border-light dark:border-border-dark rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none text-text-main dark:text-text-light text-sm"
                                                 />
                                             </div>

@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useTheme } from '../context/ThemeContext'
 import { useAuth } from '../context/AuthContext'
+import UserAvatar from './UserAvatar'
 
 // Lista de enlaces principales que aparecen en la barra superior (Menú)
 const NAV_LINKS = [
@@ -30,6 +31,7 @@ export default function Header() {
     const location = useLocation()
     const navigate = useNavigate()
     const dropdownRef = useRef(null)
+    const userPoints = user?.points ?? 0
 
     // Este efecto se da cuenta si el usuario da clic FUERA del menú de la foto,
     // y si es así, lo cierra automáticamente para no estorbar.
@@ -85,7 +87,7 @@ export default function Header() {
                     <div className="hidden md:flex items-center gap-2 bg-gray-100 dark:bg-slate-800 px-3 py-1 rounded-full border border-border-light dark:border-border-dark">
                         <span className="material-symbols-outlined text-primary text-sm">savings</span>
                         <span className="font-black text-text-main dark:text-text-light text-xs">
-                            {user.points.toLocaleString()} PTS
+                            {userPoints.toLocaleString()} PTS
                         </span>
                     </div>
                 )}
@@ -98,13 +100,12 @@ export default function Header() {
                                 onClick={() => setDropdownOpen(!dropdownOpen)}
                                 className="group relative flex items-center gap-0 cursor-pointer"
                             >
-                                <div
-                                    className={`size-10 rounded-full bg-cover bg-center border-2 shadow-sm transition-all ${dropdownOpen
-                                        ? 'border-primary ring-2 ring-primary/20'
-                                        : 'border-primary/40 hover:border-primary ring-2 ring-transparent hover:ring-primary/20'
+                                <UserAvatar
+                                    user={user}
+                                    className={`transition-all ${dropdownOpen
+                                        ? 'ring-2 ring-primary/20'
+                                        : 'ring-2 ring-transparent hover:ring-primary/20'
                                         }`}
-                                    style={{ backgroundImage: `url('${user.avatar}')` }}
-                                    title={`Perfil de ${user.name}`}
                                 />
                                 <div className="absolute -bottom-0.5 -right-0.5 size-3 bg-primary rounded-full border-2 border-surface-light dark:border-surface-dark" />
                             </button>
@@ -114,10 +115,7 @@ export default function Header() {
                                     {/* User info header */}
                                     <div className="p-4 border-b border-border-light dark:border-border-dark bg-gray-50/50 dark:bg-white/5">
                                         <div className="flex items-center gap-3">
-                                            <div
-                                                className="size-11 rounded-full bg-cover bg-center border-2 border-primary/30 shadow-sm"
-                                                style={{ backgroundImage: `url('${user.avatar}')` }}
-                                            />
+                                            <UserAvatar user={user} size="lg" />
                                             <div className="flex-1 min-w-0">
                                                 <p className="text-sm font-bold text-text-main dark:text-text-light truncate">{user.name}</p>
                                                 <p className="text-[10px] text-text-muted truncate">{user.email}</p>
@@ -125,7 +123,7 @@ export default function Header() {
                                         </div>
                                         <div className="mt-3 flex items-center gap-2 bg-primary/10 px-3 py-1.5 rounded-lg">
                                             <span className="material-symbols-outlined text-primary text-sm">savings</span>
-                                            <span className="text-xs font-bold text-primary">{user.points.toLocaleString()} puntos disponibles</span>
+                                            <span className="text-xs font-bold text-primary">{userPoints.toLocaleString()} puntos disponibles</span>
                                         </div>
                                     </div>
 
@@ -190,13 +188,10 @@ export default function Header() {
                 <div className="absolute top-[70px] right-4 left-4 md:hidden flex flex-col gap-1 bg-surface-light dark:bg-surface-dark p-4 rounded-2xl shadow-xl border border-border-light dark:border-border-dark z-[100]">
                     {isLoggedIn && (
                         <div className="flex items-center gap-3 pb-3 mb-2 border-b border-border-light dark:border-border-dark">
-                            <div
-                                className="size-9 rounded-full bg-cover bg-center border-2 border-primary/40"
-                                style={{ backgroundImage: `url('${user.avatar}')` }}
-                            />
+                            <UserAvatar user={user} size="sm" />
                             <div>
                                 <p className="text-sm font-bold text-text-main dark:text-text-light">{user.name}</p>
-                                <p className="text-[10px] text-text-muted">{user.points.toLocaleString()} PTS</p>
+                                <p className="text-[10px] text-text-muted">{userPoints.toLocaleString()} PTS</p>
                             </div>
                         </div>
                     )}

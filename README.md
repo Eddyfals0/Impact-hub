@@ -46,7 +46,9 @@ Arquitectura: **monolito monorepo cliente-servidor** desplegable en Vercel.
 
 1.  Conecta el repo en el dashboard de Vercel (framework auto-detectado: Vite).
 2.  En **Project Settings → Environment Variables** agrega: `DATABASE_URL`, `GOOGLE_CLIENT_ID`, `VITE_GOOGLE_CLIENT_ID`.
-3.  Vercel compila el cliente (`vite build` → `dist/`) y publica la función de `api/[[...route]].ts`. No se requiere nada extra, `vercel.json` ya está configurado.
+3.  Agrega también `JWT_SECRET` con un valor largo y aleatorio, y `NODEJS_HELPERS=0` para que el adaptador Node de Hono funcione correctamente en Vercel.
+4.  En Google Cloud Console, en tu OAuth Client, agrega el dominio de producción en **Authorized JavaScript origins**. Ejemplo: `https://impact-hub-nu.vercel.app`.
+5.  Vercel compila el cliente (`vite build` → `dist/`) y publica la función de `api/[...route].ts`. `vercel.json` deja las rutas de React Router apuntando a `index.html` sin interceptar `/api`.
 
 ---
 

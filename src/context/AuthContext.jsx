@@ -3,6 +3,7 @@ import { createContext, useContext, useState, useEffect } from 'react'
 
 const AuthContext = createContext()
 const SESSION_TOKEN_KEY = 'impacthub_auth_token'
+const API_TIMEOUT_MS = 15000
 
 // Atajo para usar la información de inicio de sesión en cualquier parte.
 export const useAuth = () => useContext(AuthContext)
@@ -31,10 +32,23 @@ export function AuthProvider({ children }) {
             headers.set('Authorization', `Bearer ${token}`)
         }
 
-        return fetch(path, {
-            ...init,
-            headers,
-        })
+        const controller = new AbortController()
+        const timeout = window.setTimeout(() => controller.abort(), API_TIMEOUT_MS)
+
+        try {
+            return await fetch(path, {
+                ...init,
+                headers,
+                signal: controller.signal,
+            })
+        } catch (error) {
+            if (error.name === 'AbortError') {
+                throw new Error('El servidor tardó demasiado en responder. Revisa la función /api en Vercel.')
+            }
+            throw error
+        } finally {
+            window.clearTimeout(timeout)
+        }
     }
 
     const readApiPayload = async (response) => {
@@ -44,9 +58,35 @@ export function AuthProvider({ children }) {
         }
 
         const text = await response.text()
-        return {
-            error: text || 'El servidor devolvio una respuesta invalida',
+        return { error: text || 'El servidor devolvio una respuesta invalida' }
+    }
+
+    const requestAuth = async (path, payload, fallbackMessage) => {
+        let res
+        try {
+            res = await apiFetch(path, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload),
+            })
+        } catch (error) {
+            const message = error.message || 'No se pudo conectar con el servidor'
+            setAuthError(message)
+            throw new Error(message)
         }
+
+        const data = await readApiPayload(res)
+        if (!res.ok) {
+            const statusMessage = res.status === 403
+                ? 'La API respondió 403 Forbidden. Revisa Deployment Protection/Firewall en Vercel.'
+                : fallbackMessage
+            const message = data?.error || statusMessage
+            setAuthError(message)
+            throw new Error(message)
+        }
+
+        persistSession(data.user, data.token)
+        return data.user
     }
 
     useEffect(() => {
@@ -78,59 +118,17 @@ export function AuthProvider({ children }) {
 
     const loginWithEmail = async ({ email, password }) => {
         setAuthError('')
-        const res = await fetch('/api/auth/login', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, password }),
-        })
-
-        const data = await readApiPayload(res)
-        if (!res.ok) {
-            const message = data?.error || 'No fue posible iniciar sesión'
-            setAuthError(message)
-            throw new Error(message)
-        }
-
-        persistSession(data.user, data.token)
-        return data.user
+        return requestAuth('/api/auth/login', { email, password }, 'No fue posible iniciar sesión')
     }
 
     const registerWithEmail = async ({ name, email, password }) => {
         setAuthError('')
-        const res = await fetch('/api/auth/register', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ name, email, password }),
-        })
-
-        const data = await readApiPayload(res)
-        if (!res.ok) {
-            const message = data?.error || 'No fue posible crear la cuenta'
-            setAuthError(message)
-            throw new Error(message)
-        }
-
-        persistSession(data.user, data.token)
-        return data.user
+        return requestAuth('/api/auth/register', { name, email, password }, 'No fue posible crear la cuenta')
     }
 
     const loginWithGoogle = async (idToken) => {
         setAuthError('')
-        const res = await fetch('/api/auth/google', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ idToken }),
-        })
-
-        const data = await readApiPayload(res)
-        if (!res.ok) {
-            const message = data?.error || 'No fue posible iniciar con Google'
-            setAuthError(message)
-            throw new Error(message)
-        }
-
-        persistSession(data.user, data.token)
-        return data.user
+        return requestAuth('/api/auth/google', { idToken }, 'No fue posible iniciar con Google')
     }
 
     // Compatibilidad con llamadas anteriores.

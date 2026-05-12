@@ -5,9 +5,8 @@ import { Link } from 'react-router-dom'
 // Permite a los usuarios entretenerse mientras ayudan a conseguir más fondos.
 export default function JuegoPage() {
     const canvasRef = useRef(null)
-    const [score, setScore] = useState(0)
-    const [altitude, setAltitude] = useState(0)
-    const [gameState, setGameState] = useState('idle') // idle | playing | over
+    const scoreDisplayRef = useRef(null)
+    const altitudeDisplayRef = useRef(null)
 
     const gameLoop = useRef(null)
     const balloonY = useRef(300)
@@ -16,15 +15,18 @@ export default function JuegoPage() {
     const frameCount = useRef(0)
     const altRef = useRef(0)
 
+    const scoreRef = useRef(0)
+
     const startGame = useCallback(() => {
-        setScore(0)
-        setAltitude(0)
+        scoreRef.current = 0
+        altRef.current = 0
         setGameState('playing')
         balloonY.current = 300
         balloonVelocity.current = 0
         obstacles.current = []
         frameCount.current = 0
-        altRef.current = 0
+        if (scoreDisplayRef.current) scoreDisplayRef.current.innerText = '0'
+        if (altitudeDisplayRef.current) altitudeDisplayRef.current.innerText = '0m'
     }, [])
 
     const handleClick = useCallback(() => {
@@ -72,7 +74,10 @@ export default function JuegoPage() {
             // Clouds
             frameCount.current++
             altRef.current += 0.5
-            setAltitude(Math.floor(altRef.current))
+            
+            if (altitudeDisplayRef.current) {
+                altitudeDisplayRef.current.innerText = `${Math.floor(altRef.current)}m`
+            }
 
             const cloudOffset = (frameCount.current * 0.3) % 600
             ctx.fillStyle = 'rgba(255,255,255,0.6)'
@@ -112,7 +117,10 @@ export default function JuegoPage() {
 
                 if (obs.x + obs.width < 245 && !obs.scored) {
                     obs.scored = true
-                    setScore((s) => s + 1)
+                    scoreRef.current += 1
+                    if (scoreDisplayRef.current) {
+                        scoreDisplayRef.current.innerText = `${scoreRef.current}`
+                    }
                 }
             })
 
@@ -181,8 +189,8 @@ export default function JuegoPage() {
                                     {gameState === 'over' ? (
                                         <>
                                             <p className="text-white text-sm uppercase font-bold tracking-wider">Fin del juego</p>
-                                            <p className="text-5xl font-black text-primary">{score} pts</p>
-                                            <p className="text-white/80 text-sm">Altitud: {altitude}m</p>
+                                            <p className="text-5xl font-black text-primary">{scoreRef.current} pts</p>
+                                            <p className="text-white/80 text-sm">Altitud: {Math.floor(altRef.current)}m</p>
                                         </>
                                     ) : (
                                         <>
@@ -197,11 +205,11 @@ export default function JuegoPage() {
                                 <div className="absolute top-4 left-4 right-4 flex justify-between">
                                     <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur px-4 py-2 rounded-xl shadow-lg">
                                         <p className="text-[10px] uppercase font-bold text-text-muted">Puntos</p>
-                                        <p className="text-lg font-black text-text-main dark:text-text-light">{score}</p>
+                                        <p ref={scoreDisplayRef} className="text-lg font-black text-text-main dark:text-text-light">{scoreRef.current}</p>
                                     </div>
                                     <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur px-4 py-2 rounded-xl shadow-lg">
                                         <p className="text-[10px] uppercase font-bold text-text-muted">Altitud</p>
-                                        <p className="text-lg font-black text-text-main dark:text-text-light">{altitude}m</p>
+                                        <p ref={altitudeDisplayRef} className="text-lg font-black text-text-main dark:text-text-light">{Math.floor(altRef.current)}m</p>
                                     </div>
                                 </div>
                             )}
@@ -214,8 +222,8 @@ export default function JuegoPage() {
             <section className="w-full max-w-[1280px] px-4 md:px-10 pb-20">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     {[
-                        { icon: 'emoji_events', label: 'Tu Mejor Puntuación', value: `${score} pts`, color: 'text-yellow-500', bg: 'bg-yellow-400/10' },
-                        { icon: 'public', label: 'Fondos Desbloqueados', value: `$${(score * 2.5).toFixed(0)}`, color: 'text-primary', bg: 'bg-primary/10' },
+                        { icon: 'emoji_events', label: 'Tu Mejor Puntuación', value: `${scoreRef.current} pts`, color: 'text-yellow-500', bg: 'bg-yellow-400/10' },
+                        { icon: 'public', label: 'Fondos Desbloqueados', value: `$${(scoreRef.current * 2.5).toFixed(0)}`, color: 'text-primary', bg: 'bg-primary/10' },
                         { icon: 'leaderboard', label: 'Posición Global', value: '#4,231', color: 'text-blue-500', bg: 'bg-blue-400/10' },
                     ].map((stat) => (
                         <div key={stat.label} className="flex items-center gap-4 p-6 bg-surface-light dark:bg-surface-dark rounded-2xl border border-border-light dark:border-border-dark shadow-sm">

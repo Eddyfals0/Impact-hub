@@ -2,12 +2,20 @@ import { Hono } from 'hono';
 import { db } from './db/index.js';
 import { users, projects, donations } from './db/schema.js';
 import { eq } from 'drizzle-orm';
-import { compare, hash } from 'bcryptjs';
-import { OAuth2Client } from 'google-auth-library';
+import { createHash, randomBytes } from 'node:crypto';
+// google-auth-library will be lazily imported to reduce cold start size
 import { sign, verify } from 'hono/jwt';
 
 export const app = new Hono().basePath('/api');
-const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+// Lazy-load google-auth-library (es enorme y causa cold start lento)
+let _googleClient: any = null;
+async function getGoogleClient() {
+  if (!_googleClient) {
+    const { OAuth2Client } = await import('google-auth-library');
+    _googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+  }
+  return _googleClient;
+}
 
 const normalizeEmail = (email: string) => email.trim().toLowerCase();
 
@@ -126,7 +134,8 @@ app.post('/auth/register', async (c) => {
       return c.json({ error: 'Email already registered' }, 409);
     }
 
-    const passwordHash = await hash(password, 6);
+    const salt = randomBytes(16).toString('hex');
+    const passwordHash = salt + ':' + createHash('sha256').update(salt + password).digest('hex');
     const now = new Date();
 
     let userRecord: typeof users.$inferSelect;
@@ -182,7 +191,9 @@ app.post('/auth/login', async (c) => {
       return c.json({ error: 'Invalid credentials' }, 401);
     }
 
-    const valid = await compare(password, matched[0].passwordHash);
+    const [storedSalt, storedHash] = (matched[0].passwordHash || '').split(':');
+    const inputHash = createHash('sha256').update((storedSalt || '') + password).digest('hex');
+    const valid = storedHash === inputHash;
     if (!valid) {
       return c.json({ error: 'Invalid credentials' }, 401);
     }
@@ -212,6 +223,7 @@ app.post('/auth/google', async (c) => {
     if (!audience) {
       return c.json({ error: 'Google auth is not configured on server' }, 500);
     }
+    const googleClient = await getGoogleClient();
     const ticket = await googleClient.verifyIdToken({
       idToken,
       audience,

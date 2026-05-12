@@ -66,6 +66,15 @@ const getAuthUser = async (c: any) => {
   }
 };
 
+// ── Helper: extraer body sin hang en Vercel ──
+const readBody = async (c: any) => {
+  const nodeReq = c.env?.incoming || c.req.raw;
+  if (nodeReq && nodeReq.body && typeof nodeReq.body === 'object' && !Buffer.isBuffer(nodeReq.body)) {
+    return nodeReq.body;
+  }
+  return await c.req.json().catch(() => ({}));
+};
+
 // ── Paquetes de puntos mock ──
 const POINT_PACKAGES: Record<string, { points: number; price: string }> = {
   starter:  { points: 100,  price: '$1' },
@@ -117,7 +126,7 @@ app.get('/auth/me', async (c) => {
 
 app.post('/auth/register', async (c) => {
   try {
-    const body = await c.req.json();
+    const body = await readBody(c);
     const name = String(body?.name ?? '').trim();
     const email = normalizeEmail(String(body?.email ?? ''));
     const password = String(body?.password ?? '');
@@ -178,7 +187,7 @@ app.post('/auth/register', async (c) => {
 
 app.post('/auth/login', async (c) => {
   try {
-    const body = await c.req.json();
+    const body = await readBody(c);
     const email = normalizeEmail(String(body?.email ?? ''));
     const password = String(body?.password ?? '');
 
@@ -213,7 +222,7 @@ app.post('/auth/login', async (c) => {
 
 app.post('/auth/google', async (c) => {
   try {
-    const body = await c.req.json();
+    const body = await readBody(c);
     const idToken = String(body?.idToken ?? '');
     if (!idToken) {
       return c.json({ error: 'idToken is required' }, 400);
@@ -314,7 +323,7 @@ app.get('/projects/:id', async (c) => {
 
 app.post('/projects', async (c) => {
   try {
-    const body = await c.req.json();
+    const body = await readBody(c);
     const title = String(body?.title ?? '').trim();
     const description = String(body?.description ?? '').trim();
     const goal = Number(body?.goal ?? 0);
@@ -363,7 +372,7 @@ app.post('/points/buy', async (c) => {
       return c.json({ error: 'Debes iniciar sesión para comprar puntos' }, 401);
     }
 
-    const body = await c.req.json();
+    const body = await readBody(c);
     const packageId = String(body?.packageId ?? '').trim();
     const pkg = POINT_PACKAGES[packageId];
     if (!pkg) {
@@ -397,7 +406,7 @@ app.post('/donations/authenticated', async (c) => {
       return c.json({ error: 'Debes iniciar sesión para donar con puntos' }, 401);
     }
 
-    const body = await c.req.json();
+    const body = await readBody(c);
     const projectId = Number(body?.projectId ?? 0);
     const amount = Number(body?.amount ?? 0);
 
@@ -463,7 +472,7 @@ app.post('/donations/authenticated', async (c) => {
 
 app.post('/donations/anonymous', async (c) => {
   try {
-    const body = await c.req.json();
+    const body = await readBody(c);
     const projectId = Number(body?.projectId ?? 0);
     const amount = Number(body?.amount ?? 0);
     const donorName = String(body?.donorName ?? '').trim();

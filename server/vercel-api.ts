@@ -53,26 +53,30 @@ const sendJson = (res: any, status: number, payload: unknown) => {
 };
 
 const readJsonBody = async (req: any) => {
+  // Vercel con bodyParser:true pasa un objeto ya parseado
   if (req.body && typeof req.body === 'object' && !Buffer.isBuffer(req.body)) {
     return req.body;
   }
-
+  // Vercel con bodyParser:false puede pasar string o Buffer
   if (typeof req.body === 'string') {
     return req.body ? JSON.parse(req.body) : {};
   }
-
   if (Buffer.isBuffer(req.body)) {
     const text = req.body.toString('utf8');
     return text ? JSON.parse(text) : {};
   }
-
-  const chunks: Buffer[] = [];
-  for await (const chunk of req) {
-    chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
-  }
-
-  const text = Buffer.concat(chunks).toString('utf8');
-  return text ? JSON.parse(text) : {};
+  // Fallback: leer stream con timeout de 5s para evitar hang infinito
+  return new Promise((resolve, reject) => {
+    const chunks: Buffer[] = [];
+    const timer = setTimeout(() => resolve({}), 5000);
+    req.on('data', (chunk: Buffer) => chunks.push(chunk));
+    req.on('end', () => {
+      clearTimeout(timer);
+      const text = Buffer.concat(chunks).toString('utf8');
+      resolve(text ? JSON.parse(text) : {});
+    });
+    req.on('error', (e: Error) => { clearTimeout(timer); reject(e); });
+  });
 };
 
 const methodGuard = (req: any, res: any, method: string) => {

@@ -13,6 +13,9 @@ const getMemberYear = (createdAt) => {
 
 const getImpactProfile = (user) => {
     const points = user?.points ?? 0
+    const totalContributed = Number(user?.totalContributed ?? 0)
+    const donationCount = Number(user?.donationCount ?? 0)
+    const livesImpacted = Number(user?.livesImpacted ?? 0)
     const level = Math.max(1, Math.floor(points / 1000) + 1)
     const xpNext = level * 1000
     const rewardTotal = 5800
@@ -21,11 +24,12 @@ const getImpactProfile = (user) => {
         email: user?.email || '',
         role: user?.bio || ROLE_LABELS[user?.role] || 'Donante',
         memberSince: getMemberYear(user?.createdAt),
-        projects: 0,
-        totalContributed: '$0',
-        contributedChange: '0%',
+        projects: donationCount,
+        totalContributed: `$${totalContributed.toLocaleString()}`,
+        contributedChange: donationCount > 0 ? `${donationCount} donaciones` : '0%',
         impactPoints: points,
-        livesImpacted: 0,
+        livesImpacted,
+        hasDonations: donationCount > 0,
         level,
         levelTitle: points >= 5000 ? 'Constructor de Comunidad' : points >= 1000 ? 'Colaborador Activo' : 'Nuevo Donante',
         xp: points,
@@ -199,7 +203,7 @@ export default function UserPage() {
                         {[
                             { label: 'Total Contribuido', value: profile.totalContributed, icon: 'savings', iconBg: 'bg-primary/10', iconColor: 'text-green-700 dark:text-primary', badge: profile.contributedChange, badgeBg: 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400', badgeExtra: 'vs mes anterior', hoverBorder: 'hover:border-primary/50' },
                             { label: 'Puntos de Impacto', value: profile.impactPoints.toLocaleString(), icon: 'stars', iconBg: 'bg-yellow-100 dark:bg-yellow-900/20', iconColor: 'text-yellow-700 dark:text-yellow-400', badge: 'Canjear →', badgeBg: 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400', isLink: true, hoverBorder: 'hover:border-yellow-500/50' },
-                            { label: 'Vidas Impactadas', value: profile.livesImpacted, icon: 'diversity_1', iconBg: 'bg-primary/10', iconColor: 'text-green-700 dark:text-primary', badgeExtra: 'Familias apoyadas', hoverBorder: 'hover:border-primary/50' },
+                            { label: 'Vidas Impactadas', value: profile.livesImpacted, icon: 'diversity_1', iconBg: 'bg-primary/10', iconColor: 'text-green-700 dark:text-primary', badgeExtra: profile.hasDonations ? 'Familias apoyadas' : '', hoverBorder: 'hover:border-primary/50' },
                         ].map((s) => (
                             <div key={s.label} className={`bg-surface-light dark:bg-surface-dark p-6 rounded-xl shadow-sm border border-border-light dark:border-border-dark relative overflow-hidden group ${s.hoverBorder} transition-colors`}>
                                 <div className={`absolute top-4 right-4 p-2 ${s.iconBg} rounded-lg ${s.iconColor}`}>

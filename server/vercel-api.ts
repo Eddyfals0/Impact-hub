@@ -1,5 +1,6 @@
 import { createHash, randomBytes } from 'node:crypto';
 import { eq } from 'drizzle-orm';
+import { sql } from 'drizzle-orm';
 import { sign, verify } from 'hono/jwt';
 import { db } from './db/index.js';
 import { projects, users, donations } from './db/schema.js';
@@ -23,20 +24,45 @@ const defaultAvatarFor = (name: string, email: string) => {
   return `https://i.pravatar.cc/100?u=${seed}`;
 };
 
-const toPublicUser = (user: typeof users.$inferSelect) => ({
-  id: user.id,
-  name: user.name,
-  email: user.email,
-  avatar: user.avatar,
-  points: user.points ?? 0,
-  authProvider: user.authProvider,
-  role: user.role,
-  country: user.country,
-  bio: user.bio,
-  isEmailVerified: user.isEmailVerified,
-  createdAt: user.createdAt,
-  updatedAt: user.updatedAt,
-});
+const getUserImpactStats = async (userId: number) => {
+  const rows = await db
+    .select({
+      totalContributed: sql<string>`coalesce(sum(${donations.amount}), 0)`,
+      donationCount: sql<string>`count(*)`,
+    })
+    .from(donations)
+    .where(eq(donations.userId, userId));
+
+  const totalContributed = Number(rows[0]?.totalContributed ?? 0);
+  const donationCount = Number(rows[0]?.donationCount ?? 0);
+  const livesImpacted = totalContributed > 0 ? Math.max(1, Math.floor(totalContributed / 25)) : 0;
+
+  return {
+    totalContributed,
+    donationCount,
+    livesImpacted,
+  };
+};
+
+const toPublicUser = async (user: typeof users.$inferSelect) => {
+  const impactStats = await getUserImpactStats(user.id);
+
+  return {
+    id: user.id,
+    name: user.name,
+    email: user.email,
+    avatar: user.avatar,
+    points: user.points ?? 0,
+    authProvider: user.authProvider,
+    role: user.role,
+    country: user.country,
+    bio: user.bio,
+    isEmailVerified: user.isEmailVerified,
+    createdAt: user.createdAt,
+    updatedAt: user.updatedAt,
+    ...impactStats,
+  };
+};
 
 const slugify = (value: string) =>
   value
@@ -127,7 +153,7 @@ export async function meHandler(req: any, res: any) {
       return;
     }
 
-    sendJson(res, 200, toPublicUser(matched[0]));
+    sendJson(res, 200, await toPublicUser(matched[0]));
   } catch (error: any) {
     sendJson(res, 500, { error: error.message });
   }
@@ -192,7 +218,7 @@ export async function registerHandler(req: any, res: any) {
     }
 
     const token = await sign({ id: userRecord.id }, JWT_SECRET, 'HS256');
-    sendJson(res, 201, { user: toPublicUser(userRecord), token });
+    sendJson(res, 201, { user: await toPublicUser(userRecord), token });
   } catch (error: any) {
     sendJson(res, 500, { error: error.message });
   }
@@ -232,7 +258,7 @@ export async function loginHandler(req: any, res: any) {
       .returning();
 
     const token = await sign({ id: refreshed[0].id }, JWT_SECRET, 'HS256');
-    sendJson(res, 200, { user: toPublicUser(refreshed[0]), token });
+    sendJson(res, 200, { user: await toPublicUser(refreshed[0]), token });
   } catch (error: any) {
     sendJson(res, 500, { error: error.message });
   }
@@ -306,7 +332,7 @@ export async function googleHandler(req: any, res: any) {
     }
 
     const token = await sign({ id: userRecord.id }, JWT_SECRET, 'HS256');
-    sendJson(res, 200, { user: toPublicUser(userRecord), token });
+    sendJson(res, 200, { user: await toPublicUser(userRecord), token });
   } catch (error: any) {
     sendJson(res, 401, { error: error.message });
   }
@@ -405,7 +431,7 @@ export async function pointsBuyHandler(req: any, res: any) {
     if (!pkg) { sendJson(res, 400, { error: 'Paquete inválido' }); return; }
     const newPoints = (authUser.points ?? 0) + pkg.points;
     const updated = await db.update(users).set({ points: newPoints, updatedAt: new Date() }).where(eq(users.id, authUser.id)).returning();
-    sendJson(res, 200, { user: toPublicUser(updated[0]), purchased: pkg });
+    sendJson(res, 200, { user: await toPublicUser(updated[0]), purchased: pkg });
   } catch (error: any) {
     sendJson(res, 500, { error: error.message });
   }
@@ -433,7 +459,7 @@ export async function donationsAuthenticatedHandler(req: any, res: any) {
     const newRaised = (projectMatch[0].raised ?? 0) + amount;
     const updatedProject = await db.update(projects).set({ raised: newRaised, updatedAt: new Date() }).where(eq(projects.id, projectId)).returning();
     await db.insert(donations).values({ projectId, userId: authUser.id, amount, donorName: authUser.name, donorEmail: authUser.email, isAnonymous: false });
-    sendJson(res, 200, { user: toPublicUser(updatedUser[0]), project: updatedProject[0], message: `¡Donaste ${amount} puntos a "${updatedProject[0].title}"!` });
+    sendJson(res, 200, { user: await toPublicUser(updatedUser[0]), project: updatedProject[0], message: `¡Donaste ${amount} puntos a "${updatedProject[0].title}"!` });
   } catch (error: any) {
     sendJson(res, 500, { error: error.message });
   }

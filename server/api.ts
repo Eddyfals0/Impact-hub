@@ -2,6 +2,7 @@ import { Hono } from 'hono';
 import { db } from './db/index.js';
 import { users, projects, donations } from './db/schema.js';
 import { eq } from 'drizzle-orm';
+import { sql } from 'drizzle-orm';
 import { createHash, randomBytes } from 'node:crypto';
 // google-auth-library will be lazily imported to reduce cold start size
 import { sign, verify } from 'hono/jwt';
@@ -24,20 +25,45 @@ const defaultAvatarFor = (name: string, email: string) => {
   return `https://i.pravatar.cc/100?u=${seed}`;
 };
 
-const toPublicUser = (user: typeof users.$inferSelect) => ({
-  id: user.id,
-  name: user.name,
-  email: user.email,
-  avatar: user.avatar,
-  points: user.points ?? 0,
-  authProvider: user.authProvider,
-  role: user.role,
-  country: user.country,
-  bio: user.bio,
-  isEmailVerified: user.isEmailVerified,
-  createdAt: user.createdAt,
-  updatedAt: user.updatedAt,
-});
+const getUserImpactStats = async (userId: number) => {
+  const rows = await db
+    .select({
+      totalContributed: sql<string>`coalesce(sum(${donations.amount}), 0)`,
+      donationCount: sql<string>`count(*)`,
+    })
+    .from(donations)
+    .where(eq(donations.userId, userId));
+
+  const totalContributed = Number(rows[0]?.totalContributed ?? 0);
+  const donationCount = Number(rows[0]?.donationCount ?? 0);
+  const livesImpacted = totalContributed > 0 ? Math.max(1, Math.floor(totalContributed / 25)) : 0;
+
+  return {
+    totalContributed,
+    donationCount,
+    livesImpacted,
+  };
+};
+
+const toPublicUser = async (user: typeof users.$inferSelect) => {
+  const impactStats = await getUserImpactStats(user.id);
+
+  return {
+    id: user.id,
+    name: user.name,
+    email: user.email,
+    avatar: user.avatar,
+    points: user.points ?? 0,
+    authProvider: user.authProvider,
+    role: user.role,
+    country: user.country,
+    bio: user.bio,
+    isEmailVerified: user.isEmailVerified,
+    createdAt: user.createdAt,
+    updatedAt: user.updatedAt,
+    ...impactStats,
+  };
+};
 
 
 
@@ -117,7 +143,7 @@ app.get('/auth/me', async (c) => {
       return c.json({ error: 'User not found' }, 404);
     }
 
-    return c.json(toPublicUser(matched[0]));
+    return c.json(await toPublicUser(matched[0]));
   } catch (error: any) {
     console.error('DB Error:', error);
     return c.json({ error: error.message }, 500);
@@ -179,7 +205,7 @@ app.post('/auth/register', async (c) => {
     }
 
     const token = await sign({ id: userRecord.id }, JWT_SECRET, 'HS256');
-    return c.json({ user: toPublicUser(userRecord), token }, 201);
+    return c.json({ user: await toPublicUser(userRecord), token }, 201);
   } catch (error: any) {
     return c.json({ error: error.message }, 500);
   }
@@ -214,7 +240,7 @@ app.post('/auth/login', async (c) => {
       .returning();
 
     const token = await sign({ id: refreshed[0].id }, JWT_SECRET, 'HS256');
-    return c.json({ user: toPublicUser(refreshed[0]), token });
+    return c.json({ user: await toPublicUser(refreshed[0]), token });
   } catch (error: any) {
     return c.json({ error: error.message }, 500);
   }
@@ -286,7 +312,7 @@ app.post('/auth/google', async (c) => {
     }
 
     const token = await sign({ id: userRecord.id }, JWT_SECRET, 'HS256');
-    return c.json({ user: toPublicUser(userRecord), token });
+    return c.json({ user: await toPublicUser(userRecord), token });
   } catch (error: any) {
     return c.json({ error: error.message }, 401);
   }
@@ -389,7 +415,7 @@ app.post('/points/buy', async (c) => {
       .where(eq(users.id, authUser.id))
       .returning();
 
-    return c.json({ user: toPublicUser(updated[0]), purchased: pkg });
+    return c.json({ user: await toPublicUser(updated[0]), purchased: pkg });
   } catch (error: any) {
     return c.json({ error: error.message }, 500);
   }
@@ -461,7 +487,7 @@ app.post('/donations/authenticated', async (c) => {
     });
 
     return c.json({
-      user: toPublicUser(updatedUser[0]),
+      user: await toPublicUser(updatedUser[0]),
       project: updatedProject[0],
       message: `¡Donaste ${amount} puntos a "${updatedProject[0].title}"!`,
     });

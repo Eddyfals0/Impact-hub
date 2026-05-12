@@ -1,4 +1,4 @@
-import { compare, hash } from 'bcryptjs';
+import { createHash, randomBytes } from 'node:crypto';
 import { eq } from 'drizzle-orm';
 import { OAuth2Client } from 'google-auth-library';
 import { sign, verify } from 'hono/jwt';
@@ -145,7 +145,8 @@ export async function registerHandler(req: any, res: any) {
       return;
     }
 
-    const passwordHash = await hash(password, 4);
+    const salt = randomBytes(16).toString('hex');
+    const passwordHash = salt + ':' + createHash('sha256').update(salt + password).digest('hex');
     const now = new Date();
     let userRecord: typeof users.$inferSelect;
 
@@ -204,7 +205,9 @@ export async function loginHandler(req: any, res: any) {
       return;
     }
 
-    const valid = await compare(password, matched[0].passwordHash);
+    const [storedSalt, storedHash] = (matched[0].passwordHash || '').split(':');
+    const inputHash = createHash('sha256').update((storedSalt || '') + password).digest('hex');
+    const valid = storedHash === inputHash;
     if (!valid) {
       sendJson(res, 401, { error: 'Invalid credentials' });
       return;

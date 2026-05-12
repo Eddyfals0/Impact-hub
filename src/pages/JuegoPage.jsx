@@ -4,6 +4,8 @@ import { Link } from 'react-router-dom'
 // Pantalla del minijuego ("Globo de la Esperanza").
 // Permite a los usuarios entretenerse mientras ayudan a conseguir más fondos.
 export default function JuegoPage() {
+    const [gameState, setGameState] = useState('idle')
+    const [score, setScore] = useState(0)
     const canvasRef = useRef(null)
     const scoreDisplayRef = useRef(null)
     const altitudeDisplayRef = useRef(null)
@@ -20,6 +22,7 @@ export default function JuegoPage() {
     const startGame = useCallback(() => {
         scoreRef.current = 0
         altRef.current = 0
+        setScore(0)
         setGameState('playing')
         balloonY.current = 300
         balloonVelocity.current = 0
@@ -76,7 +79,8 @@ export default function JuegoPage() {
             altRef.current += 0.5
             
             if (altitudeDisplayRef.current) {
-                altitudeDisplayRef.current.innerText = `${Math.floor(altRef.current)}m`
+                const currentAltitude = Math.floor(altRef.current)
+                altitudeDisplayRef.current.innerText = `${currentAltitude}m`
             }
 
             const cloudOffset = (frameCount.current * 0.3) % 600
@@ -121,6 +125,7 @@ export default function JuegoPage() {
                     if (scoreDisplayRef.current) {
                         scoreDisplayRef.current.innerText = `${scoreRef.current}`
                     }
+                    setScore(scoreRef.current)
                 }
             })
 
@@ -221,9 +226,9 @@ export default function JuegoPage() {
             {/* Game Stats */}
             <section className="w-full max-w-[1280px] px-4 md:px-10 pb-20">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    {[
-                        { icon: 'emoji_events', label: 'Tu Mejor Puntuación', value: `${scoreRef.current} pts`, color: 'text-yellow-500', bg: 'bg-yellow-400/10' },
-                        { icon: 'public', label: 'Fondos Desbloqueados', value: `$${(scoreRef.current * 2.5).toFixed(0)}`, color: 'text-primary', bg: 'bg-primary/10' },
+                        {[
+                        { icon: 'emoji_events', label: 'Tu Mejor Puntuación', value: `${score} pts`, color: 'text-yellow-500', bg: 'bg-yellow-400/10' },
+                        { icon: 'public', label: 'Fondos Desbloqueados', value: `$${(score * 2.5).toFixed(0)}`, color: 'text-primary', bg: 'bg-primary/10' },
                         { icon: 'leaderboard', label: 'Posición Global', value: '#4,231', color: 'text-blue-500', bg: 'bg-blue-400/10' },
                     ].map((stat) => (
                         <div key={stat.label} className="flex items-center gap-4 p-6 bg-surface-light dark:bg-surface-dark rounded-2xl border border-border-light dark:border-border-dark shadow-sm">

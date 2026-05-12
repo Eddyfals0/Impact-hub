@@ -1,12 +1,20 @@
 import { createHash, randomBytes } from 'node:crypto';
 import { eq } from 'drizzle-orm';
-import { OAuth2Client } from 'google-auth-library';
 import { sign, verify } from 'hono/jwt';
 import { db } from './db/index.js';
 import { projects, users, donations } from './db/schema.js';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback_secret_do_not_use_in_prod';
-const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+
+// Lazy-load google-auth-library (es enorme y causa cold start lento)
+let _googleClient: any = null;
+async function getGoogleClient() {
+  if (!_googleClient) {
+    const { OAuth2Client } = await import('google-auth-library');
+    _googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+  }
+  return _googleClient;
+}
 
 const normalizeEmail = (email: string) => email.trim().toLowerCase();
 
@@ -243,7 +251,8 @@ export async function googleHandler(req: any, res: any) {
       return;
     }
 
-    const ticket = await googleClient.verifyIdToken({ idToken, audience });
+    const client = await getGoogleClient();
+    const ticket = await client.verifyIdToken({ idToken, audience });
     const payload = ticket.getPayload();
     if (!payload?.sub || !payload?.email) {
       sendJson(res, 401, { error: 'Invalid Google token payload' });

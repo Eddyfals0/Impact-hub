@@ -109,6 +109,17 @@ const POINT_PACKAGES: Record<string, { points: number; price: string }> = {
   mega:     { points: 5000, price: '$50' },
 };
 
+const SHOP_PRODUCTS: Record<number, { id: number; name: string; pts: number }> = {
+  1: { id: 1, name: 'Globo Futurista \u002726', pts: 500 },
+  2: { id: 2, name: 'Camiseta ODS 1', pts: 2500 },
+  3: { id: 3, name: 'Pack Reacciones', pts: 200 },
+  4: { id: 4, name: 'Tote Bag Eco', pts: 1200 },
+  5: { id: 5, name: 'Globo Galaxia', pts: 800 },
+  6: { id: 6, name: 'Gorra Impact', pts: 1800 },
+  7: { id: 7, name: 'Marco Avatar Ne\u00f3n', pts: 350 },
+  8: { id: 8, name: 'Pack Gaming LoL', pts: 3000 },
+};
+
 app.get('/hello', (c) => {
   return c.json({ message: 'Hello from Vercel + Hono!' });
 });
@@ -416,6 +427,42 @@ app.post('/points/buy', async (c) => {
       .returning();
 
     return c.json({ user: await toPublicUser(updated[0]), purchased: pkg });
+  } catch (error: any) {
+    return c.json({ error: error.message }, 500);
+  }
+});
+
+app.post('/shop/redeem', async (c) => {
+  try {
+    const authUser = await getAuthUser(c);
+    if (!authUser) {
+      return c.json({ error: 'Debes iniciar sesión para canjear premios' }, 401);
+    }
+
+    const body = await readBody(c);
+    const productId = Number(body?.productId ?? 0);
+    const product = SHOP_PRODUCTS[productId];
+    if (!product) {
+      return c.json({ error: 'Producto inválido' }, 400);
+    }
+
+    const currentPoints = authUser.points ?? 0;
+    if (currentPoints < product.pts) {
+      return c.json({ error: `No tienes suficientes puntos. Tienes ${currentPoints}, necesitas ${product.pts}` }, 400);
+    }
+
+    const newPoints = currentPoints - product.pts;
+    const updated = await db
+      .update(users)
+      .set({ points: newPoints, updatedAt: new Date() })
+      .where(eq(users.id, authUser.id))
+      .returning();
+
+    return c.json({
+      user: await toPublicUser(updated[0]),
+      redeemed: product,
+      message: `Canjeaste ${product.name} por ${product.pts.toLocaleString()} puntos`,
+    });
   } catch (error: any) {
     return c.json({ error: error.message }, 500);
   }

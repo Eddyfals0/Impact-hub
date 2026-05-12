@@ -415,6 +415,17 @@ const POINT_PACKAGES: Record<string, { id: string; points: number; price: string
   mega:    { id: 'mega', points: 5000, price: '$50' },
 };
 
+const SHOP_PRODUCTS: Record<number, { id: number; name: string; pts: number }> = {
+  1: { id: 1, name: 'Globo Futurista \u002726', pts: 500 },
+  2: { id: 2, name: 'Camiseta ODS 1', pts: 2500 },
+  3: { id: 3, name: 'Pack Reacciones', pts: 200 },
+  4: { id: 4, name: 'Tote Bag Eco', pts: 1200 },
+  5: { id: 5, name: 'Globo Galaxia', pts: 800 },
+  6: { id: 6, name: 'Gorra Impact', pts: 1800 },
+  7: { id: 7, name: 'Marco Avatar Ne\u00f3n', pts: 350 },
+  8: { id: 8, name: 'Pack Gaming LoL', pts: 3000 },
+};
+
 export async function pointsPackagesHandler(req: any, res: any) {
   if (!methodGuard(req, res, 'GET')) return;
   sendJson(res, 200, POINT_PACKAGES);
@@ -432,6 +443,25 @@ export async function pointsBuyHandler(req: any, res: any) {
     const newPoints = (authUser.points ?? 0) + pkg.points;
     const updated = await db.update(users).set({ points: newPoints, updatedAt: new Date() }).where(eq(users.id, authUser.id)).returning();
     sendJson(res, 200, { user: await toPublicUser(updated[0]), purchased: pkg });
+  } catch (error: any) {
+    sendJson(res, 500, { error: error.message });
+  }
+}
+
+export async function shopRedeemHandler(req: any, res: any) {
+  if (!methodGuard(req, res, 'POST')) return;
+  try {
+    const authUser = await getAuthUserFromReq(req);
+    if (!authUser) { sendJson(res, 401, { error: 'Debes iniciar sesión para canjear premios' }); return; }
+    const body = await readJsonBody(req);
+    const productId = Number(body?.productId ?? 0);
+    const product = SHOP_PRODUCTS[productId];
+    if (!product) { sendJson(res, 400, { error: 'Producto inválido' }); return; }
+    const currentPoints = authUser.points ?? 0;
+    if (currentPoints < product.pts) { sendJson(res, 400, { error: `No tienes suficientes puntos. Tienes ${currentPoints}, necesitas ${product.pts}` }); return; }
+    const newPoints = currentPoints - product.pts;
+    const updated = await db.update(users).set({ points: newPoints, updatedAt: new Date() }).where(eq(users.id, authUser.id)).returning();
+    sendJson(res, 200, { user: await toPublicUser(updated[0]), redeemed: product, message: `Canjeaste ${product.name} por ${product.pts.toLocaleString()} puntos` });
   } catch (error: any) {
     sendJson(res, 500, { error: error.message });
   }

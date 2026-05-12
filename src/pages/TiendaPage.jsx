@@ -1,4 +1,6 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
+import { useAuth } from '../context/AuthContext'
 
 const FILTERS = ['Todos', 'Skins', 'Merch', 'Emotes', 'Gaming']
 
@@ -17,11 +19,47 @@ const PRODUCTS = [
 // Aquí el usuario canjea los Puntos de Impacto que ganó jugando o donando
 // por premios físicos y recompensas virtuales.
 export default function TiendaPage() {
+    const { user, isLoggedIn, apiFetch, refreshUser } = useAuth()
     const [activeFilter, setActiveFilter] = useState('Todos')
+    const [loadingId, setLoadingId] = useState(null)
+    const [shopError, setShopError] = useState('')
+    const [shopSuccess, setShopSuccess] = useState('')
 
     const filtered = activeFilter === 'Todos'
         ? PRODUCTS
         : PRODUCTS.filter((p) => p.tag.toLowerCase() === activeFilter.toLowerCase())
+
+    const handleRedeem = async (product) => {
+        setShopError('')
+        setShopSuccess('')
+        if (!isLoggedIn) {
+            setShopError('Debes iniciar sesión para canjear premios')
+            return
+        }
+
+        setLoadingId(product.id)
+        try {
+            const response = await apiFetch('/api/shop/redeem', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ productId: product.id }),
+            })
+            const ct = response.headers.get('content-type') || ''
+            if (!ct.includes('application/json')) {
+                const txt = await response.text()
+                throw new Error(txt.slice(0, 120) || `Error del servidor (${response.status})`)
+            }
+            const data = await response.json()
+            if (!response.ok) throw new Error(data.error || 'No se pudo canjear el premio')
+
+            await refreshUser()
+            setShopSuccess(data.message)
+        } catch (error) {
+            setShopError(error.message)
+        } finally {
+            setLoadingId(null)
+        }
+    }
 
     return (
         <div className="flex flex-col items-center w-full">
@@ -70,14 +108,33 @@ export default function TiendaPage() {
                         </div>
                         <div>
                             <p className="text-[10px] font-black text-text-muted uppercase tracking-wider">Tu saldo</p>
-                            <p className="text-2xl font-black text-text-main dark:text-text-light">1,250 <span className="text-sm text-primary">PTS</span></p>
+                            <p className="text-2xl font-black text-text-main dark:text-text-light">{(user?.points ?? 0).toLocaleString()} <span className="text-sm text-primary">PTS</span></p>
                         </div>
                     </div>
-                    <div className="flex gap-2">
-                        <button className="px-6 py-3 bg-primary hover:bg-green-400 text-background-dark font-bold rounded-xl transition-all text-sm">Ganar Puntos</button>
+                    <div className="flex items-center gap-2 flex-wrap justify-end">
+                        {isLoggedIn ? (
+                            <Link to="/usuario" className="px-6 py-3 bg-primary hover:bg-green-400 text-background-dark font-bold rounded-xl transition-all text-sm">Ver perfil</Link>
+                        ) : (
+                            <Link to="/login" className="px-6 py-3 bg-primary hover:bg-green-400 text-background-dark font-bold rounded-xl transition-all text-sm">Inicia sesión</Link>
+                        )}
                     </div>
                 </div>
             </section>
+
+            {(shopError || shopSuccess) && (
+                <section className="w-full max-w-[1280px] px-4 md:px-10 mb-6">
+                    {shopError && (
+                        <div className="mb-3 rounded-2xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm font-bold text-red-600 dark:text-red-400">
+                            {shopError}
+                        </div>
+                    )}
+                    {shopSuccess && (
+                        <div className="rounded-2xl border border-primary/20 bg-primary/10 px-4 py-3 text-sm font-bold text-primary">
+                            {shopSuccess}
+                        </div>
+                    )}
+                </section>
+            )}
 
             {/* Filters */}
             <section className="w-full max-w-[1280px] px-4 md:px-10 mb-8">
@@ -111,13 +168,16 @@ export default function TiendaPage() {
                                 <h3 className="font-bold text-text-main dark:text-text-light text-lg mb-2">{p.name}</h3>
                                 <div className="mt-auto flex items-center justify-between pt-3 border-t border-border-light dark:border-border-dark">
                                     <div className="flex items-center gap-1.5">
-                                        <span className="material-symbols-outlined text-primary text-base">savingss</span>
                                         <span className="material-symbols-outlined text-primary text-base">savings</span>
                                         <span className="font-black text-text-main dark:text-text-light">{p.pts.toLocaleString()}</span>
                                         <span className="text-[10px] text-text-muted font-bold">PTS</span>
                                     </div>
-                                    <button className="px-4 py-2 bg-primary hover:bg-green-400 text-background-dark font-bold rounded-lg text-xs transition-all active:scale-95">
-                                        Canjear
+                                    <button
+                                        onClick={() => handleRedeem(p)}
+                                        disabled={!isLoggedIn || loadingId === p.id || (user?.points ?? 0) < p.pts}
+                                        className="px-4 py-2 bg-primary hover:bg-green-400 text-background-dark font-bold rounded-lg text-xs transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+                                    >
+                                        {loadingId === p.id ? 'Canjeando...' : !isLoggedIn ? 'Inicia sesión' : (user?.points ?? 0) < p.pts ? 'Sin saldo' : 'Canjear'}
                                     </button>
                                 </div>
                             </div>
